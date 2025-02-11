@@ -75,19 +75,15 @@ To install them you use either
 * **BiocManager::install** (if it comes from [Bioconductor](http://www.bioconductor.org/)):
 
 ```{r}
-#| label: install packages
 install.packages(c("BiocManager", "quarto"))
 BiocManager::install("pheatmap")
 ```
 
 Once a package is installed, you need to load it into your session with the command **library**:
 ```{r}
-#| label: load packages
 BiocManager
 library(BiocManager)
 ```
-
-{{< pagebreak >}}
 
 ## Exercise 1
 
@@ -97,30 +93,29 @@ and familiarize yourself with the language and the interface.
 Try to change some of the commands and see the effect.
 
 1. Open RStudio.
-2. Alternatively you can clone the [same gitlab repository](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025.git) into your working directory and open the directory from RStudio.
-2. Alternatively you can clone the [same gitlab repository](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025.git) into your working directory and open the directory from RStudio.
-3. Open the file [ExercisesWeek1.qmd](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025/-/blob/main/week1/ExercisesWeek1.qmd) in RStudio (this is the file used to generate the document you are currently reading...)
-4. Run the following code blocks and understand what they are doing.
+2. Create a "New project" (from the File menu), chose "Version Control" and "Git", paste the URL [https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025.git](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025.git) and chose the location on your computer to save it.
+3. Alternatively you can clone the [same gitlab repository](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025.git) into your working directory and open the directory from RStudio.
+4. Open the file [ExercisesWeek1.qmd](https://gitlab.epfl.ch/genomics-and-bioinformatics/course-data-2025/-/blob/main/week1/ExercisesWeek1.qmd) in RStudio (this is the file used to generate the document you are currently reading...)
+5. Run the following code blocks and understand what they are doing.
 
 Read the data from the tab-delimited file *GeneExpressionData.txt* (open the file as well to have a look at its content):
 ```{r}
-#| label: load data
 data = read.delim("GeneExpressionData.txt", row.names=1)
 ```
 If the file is not found, check your path and use **setwd()** to change to your working directory:
 ```{r}
-#| label: path functions
 getwd()
 ##  setwd("/YOUR/PATH/TO/GITLAB/REPO")
 dir()
 ```
 First look at the data (notice that rows and columns have names!):
 ```{r}
-#| label: data check
 dim(data)
 head(data)
 data[1:4, ]
 data$id 
+```
+```{r}
 data$C1[1]
 data$C2[3:10]
 data["ATP2A3",]
@@ -129,7 +124,6 @@ vector[4]
 ```
 Compute some basic statistics:
 ```{r}
-#| label: summary stats
 summary(data)
 summary(data$C1)
 mean(data$C2)
@@ -143,7 +137,6 @@ apply(data, 2, sd)
 ```
 Elementary data transformation (are all ratios well-defined?):
 ```{r}
-#| label: data manips
 any(data$C2==0) 
 which(data$C2==0)
 ratios = log2(data$C1/data$C2)
@@ -151,7 +144,6 @@ geomMeans = sqrt(data$C1*data$C2)
 ```
 Plot the data
 ```{r}
-#| label: plots
 plot(data$C1, data$C2, log='xy', pch=20, main='', xlab='C1', ylab='C2')
 h1 = hist(log2(data$C1), breaks=30, main='', xlab='log2 values')
 hist(log2(data$C2), br=h1$breaks, add=T, col=2)
@@ -162,22 +154,18 @@ If you would like to learn more about R, we suggest two online courses that are 
  * [UCDavis Introduction to R](https://ucdavis-bioinformatics-training.github.io/2021-March-Introduction-to-R-for-Bioinformatics/R/Intro2R_main)
  * [SIB first steps with R](https://github.com/sib-swiss/first-steps-with-R-training)
 
-{{< pagebreak >}}
-
 ## Exercise 2
 
 In this exercise we will perform a typical gene expression analysis based on a dataset from Leukemia cells:
 
 1. Load the dataset *leukemiaExpressionSubset.rds* (it is in compressed [RDS format](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/readRDS)):
 ```{r}
-#| label: load leukemia
 library(pheatmap)
 data = readRDS("leukemiaExpressionSubset.rds")
 ```
 2. In the file, samples (table columns) are named according to cell type and experiment number.
 Let us create an annotation table by splitting the sample type and the sample number in different columns:
 ```{r}
-#| label: extract sample type
 colnames(data)
 annotations = data.frame(
             LeukemiaType = substr(colnames(data),1,3),
@@ -186,7 +174,6 @@ colnames(data) = rownames(annotations)
 ```
 3. Log-transform the data, generate scatter plots of sample pairs and a boxplot of the distribution of gene expression values:
 ```{r}
-#| label: pairs and box plots
 logdata = log2(data)
 ## calculate the median per column (dimension no 2)
 meddata = apply(logdata, 2, median)
@@ -201,18 +188,14 @@ boxplot(logdata, las=2, lty=1, lwd=2, col=typeCols[annotations$LeukemiaType], pc
 ```
 4. Create a clustered "heatmap" of the data:
 ```{r}
-#| label: cluster and heatmap
 pheatmap(logdata, show_rownames=F, annotation_col=annotations, scale='none', 
          clustering_distance_cols='correlation', clustering_method='complete',
          annotation_colors=list(LeukemiaType=typeCols))
 ```
 5. Save the transformed data to a tab-delimited text file:
 ```{r}
-#| label: save to file
 write.table(logdata, file = "testoutput.txt", sep="\t", quote=F)
 ```
-
-{{< pagebreak >}}
 
 ## Exercise 3
 
@@ -225,7 +208,6 @@ Go to the [Ensembl](https://www.ensembl.org/Homo_sapiens)
 site and search for the identifier of this gene (should replace the string **ENSG00000XXXXXX** in the code).
 Use this identifier to extract the corresponding row from the log-data matrix, and show that it is disregulated in *acute leukemia (ALL, AML)*:
 ```{r}
-#| label: genome browsers
 geneid = "ENSG00000XXXXXX"
 bcl2a1_expression = as.numeric(logdata[geneid,])
 boxplot(bcl2a1_expression~annotations$LeukemiaType)
