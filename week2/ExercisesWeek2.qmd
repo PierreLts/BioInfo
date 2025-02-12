@@ -1,0 +1,171 @@
+---
+title: "2. Genome assembly, sequence alignments"
+author: "EPFL - SV - BIO-463"
+date: 02/25/2025
+date-format: long
+eval: false
+code-fold: false
+format:
+  html:
+    code-fold: false
+    embed-resources: true
+  pdf:
+    papersize: a4
+    fig-width: 8
+    fig-height: 4
+format-links: false
+---
+
+## Working environment
+
+Install R packages we will use during the course
+```{r}
+install.packages(c("BiocManager", "aphid", "seqHMM", "phytools", "quarto",
+                   "gplots", "RColorBrewer", "ape", "ggplot2", "ggfortify",
+                   "gprofiler2", "Seurat", "dplyr", "patchwork"))
+BiocManager::install(c("Biostrings", "Rgraphviz", "pheatmap", "biomaRt", "limma",
+                       "GenomicFeatures", "DESeq2", "PCAtools", "edgeR", "pwalign",
+                       "clusterProfiler", "msigdbr", "annotables", "enrichplot"))
+```
+
+Load the relevant packages for today:
+```{r}
+library("Biostrings")
+library("Rgraphviz")
+library("biomaRt")
+```
+
+## Exercise 1: Eulerian path in a graph
+### Sequencing reads
+
+The file *SequencingReads.txt* contains 22 sequencing reads. These have been prepared so that they are all in the same orientation and the overlap is 4 nucleotides for every pair of consecutive reads.
+
+* Load the data as a **[DNAStringSet](https://rdocumentation.org/packages/Biostrings/versions/2.40.2/topics/XStringSet-class)**
+   - the basic command **scan("filename", "character")** returns the content of a file as an array of strings (one string per line in the file)
+   - **DNAStringSet** then converts this array into an object that can be manipulated as a set of DNA sequences
+
+```{r}
+#### scan() the file as a list of "character" strings
+datafile = 
+#### check the content
+head(datafile) 
+#### convert to a DNAStringSet
+reads = DNAStringSet(datafile)
+#### check the result
+reads
+#### nb of reads, size of reads
+numreads = length(reads)
+readlength = width(reads[1])
+```
+
+### Constructing the graph
+
+In this part of the exercise, we will construct the Eulerian graph using the
+**[graphAM](https://www.rdocumentation.org/packages/graph/versions/1.50.0/topics/graphAM-class) class**.
+
+The nodes are the overlaps (unique 4-mers from both ends of reads) and the graph edges are the reads
+(directed links between the start node and the end node of each read).
+
+To make this construction, follow these steps:
+
+1. Make lists of all overlapping 4-mers, one for the start and one for the end of each read,
+using the **subseq** method on a **DNAStringSet** and convert the result to simple strings with **as.character**.
+2. Create the list of nodes: apply **sort** and **unique** to the combined list of starts and ends.
+3. Create the edge labels (called **edgelabels** in the code below): an edge connecting 'x' to 'y' is labelled 'x~y' (see [plot.graph](https://rdocumentation.org/packages/Rgraphviz/versions/2.16.0/topics/plot-methods)).
+This can be done with **paste(a, b, sep='~')** where **a**, **b** are lists of strings.
+
+```{r}
+readstarts = as.character(subseq(.....))
+readends = as.character(subseq(.....))
+#### construct the list of graph nodes: combines starts and ends, sorted and non-redundant:
+nodes = sort(unique(c(....)))
+numnodes = length(nodes)
+#### one graph edge for each read 
+edgelabels = 1:numreads
+#### the graph class requires edge names in the form "acgt~tacg" for an edge from node "acgt" to node "tacg"
+names(edgelabels) = paste(?,?, sep='~')
+```
+
+4. Create the adjacency matrix **A**: its columns and rows represent nodes (4-mers) from the **nodes** list,
+and the matrix element **A[x,y]** is the number of reads connecting **x** to **y**.
+```{r}
+#### Adjacency matrix numnodes x numnodes, rows and cols are named with elements of "nodes" 
+A = matrix(0, nrow=numnodes, ncol=numnodes, dimnames=list(nodes, nodes))
+for (n in 1:numreads) {
+#### read no n corresponds to a link readstarts[n] -> readends[n]
+#### by construction the row and column names of A are the strings in readstarts and readends
+}
+```
+
+5. Now display the corresponding graph as follows (you can then play with the options to improve the looks of your graph):
+```{r}
+#### define the graph
+grEuler = graphAM(adjMat=A, values=list(weight=1), edgemode="directed")
+#### customize display parameters (optional!)
+grattr = getDefaultAttrs()
+grattr$graph$size = c(7,10)
+grattr$edge$minlen = 1.5
+grattr$edge$arrowsize=.5
+grattr$edge$labelfontsize = 18
+#### display it
+edgeattr = list(label=edgelabels)
+plot(grEuler, edgeAttrs=edgeattr, attrs=grattr)
+```
+
+### Eulerian path and contig
+
+1. Manually find the eulerian path in the graph picture and write down the edge numbers in the order of their visit.
+Define a vector with these numbers and use it to order the reads accordingly.
+2. Generate the corresponding contig (the assembled genome string)
+```{r}
+edgepath = c(.....) ### edge numbers
+sortedreads = reads[edgepath]
+### This will concatenate (paste) all reads together, but the overlap is now repeated twice at each junction:
+### paste("ACTGGG", "GGGTAT") = "ACTGGGGGGTAT", it should be "ACTGGGTAT"
+### Correct the code below to retain only one copy of each overlap:
+contig = DNAStringSet(paste(sortedreads, collapse=''))
+```
+3. Save that sequence as a **[Fasta](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp)** file
+```{r}
+### Give the sequence a name: will be useful later
+names(contig) = "Week2Contig"
+writeXStringSet(contig, "Week2Contig.fa")
+```
+4. Go the the [NCBI blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) and run the following operations:
+  - Choose "Nucleotide Blast"
+  - Upload your fasta
+  - Choose "refseq_rna" database
+  - Organism: Vertebrata
+  - Run "Blast"
+5. Which gene of which species have you assembled?
+
+### Nucleotide statistics
+
+* Create a [barplot](https://rdocumentation.org/packages/graphics/versions/3.6.2/topics/barplot) of the sliding window base frequencies using
+[letterFrequencyInSlidingView](https://rdocumentation.org/packages/Biostrings/versions/2.40.2/topics/letterFrequency) of your contig
+with a window size of 20 nucleotides. The barplot should represent base frequencies (vertically) as a function of window position (horizontally).
+
+
+## Exercise 2: Align your contig to the Chicken genome
+
+1. Start from the result of Exercise 1: load the assembled contig as a **DNAString**
+2. Download the transcript found at **chr21:295510-295980** on the Chicken genome using 
+[biomaRt](http://mart.ensembl.org/info/data/biomart/biomart_r_package.html) and keep only the part between nucleotides **335** and **806**
+```{r}
+ensembl = useMart("ensembl", "ggallus_gene_ensembl")
+#### Fill in the coordinates
+ensembl_qry = getSequence(chromosome=..., start=..., end=..., type=c("uniprot_gn_symbol","start_position","strand"), seqType="cdna", mart=ensembl)
+gg_seq = subseq(DNAStringSet(ensembl_qry$cdna), ..., ...)
+```
+3. Align these two sequences using a match score of *+1*, mismatch score of *-1* and gap penalty of *-2* (you need to define the missing variables here: 
+see [scoring matrices](https://www.rdocumentation.org/packages/Biostrings/versions/2.40.2/topics/substitution.matrices))
+
+```{r}
+#### This should be your contig (load the file):
+qry_seq = readDNAStringSet(...)
+#### define scMatrix and gapPenalty
+pairwiseAlignment(qry_seq[[1]], gg_seq[[1]], substitutionMatrix=scMatrix, gapOpening=0, gapExtension=gapPenalty)
+```
+4. Go to [UCSC's Blat alignment page](http://www.genome.ucsc.edu/cgi-bin/hgBlat), select **chicken** genome (galGal6 release) and paste (or upload) the contig sequence.
+See to which genomic region it aligns to and observe the intron/exon structure.
+
