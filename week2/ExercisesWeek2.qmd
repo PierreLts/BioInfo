@@ -4,6 +4,7 @@ author: "EPFL - SV - BIO-463"
 date: 02/25/2025
 date-format: long
 eval: false
+warning: false
 code-fold: false
 format:
   html:
