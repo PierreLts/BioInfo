@@ -1,0 +1,111 @@
+---
+title: "3. Hidden Markov Models"
+author: "EPFL - SV - BIO-463"
+date: 03/04/2025
+date-format: long
+eval: false
+format:
+  html:
+    code-fold: false
+    embed-resources: true
+  pdf:
+    papersize: a4
+    fig-width: 6
+    fig-height: 4
+format-links: false
+---
+
+## Exercise 1: Translate genes, find longest open reading frame
+
+1. Load the file *GeneSequences.fa*
+```{r}
+library("Biostrings")
+genes = readDNAStringSet("GeneSequences.fa")
+```
+2. [Translate](https://www.rdocumentation.org/packages/Biostrings/versions/2.40.2/topics/translate) the sequences (in 3 frames: only the forward strand)
+```{r}
+f1 = genes
+f2 = ### second frame of "genes"
+f3 = ### third frame
+frames = translate(c(f1, f2, f3), no.init.codon=T, if.fuzzy.codon="solve")
+```
+3. Find the longest ORF in each sequence: use [matchPattern](https://www.rdocumentation.org/packages/Biostrings/versions/2.40.2/topics/matchPattern) for residues "*" and "M"
+```{r}
+### will store the longest orf for each sequence in this variable
+longest.orf = AAStringSet(rep('', length(genes)))
+names(longest.orf) = names(genes)
+### loop through every frame
+for (nf in 1:length(frames)) {
+    frm = frames[[nf]]
+    nme = names(frames)[[nf]]
+    #### search "*" in seqn and loop through results
+    stops = start(matchPattern("*", frm))
+    #### then search first "M" between last and current "*"
+    #### with n0 = position of M, n1 = position of *
+    #### if seqn[n0:n1] is longer than longest.orf[nme], then replace it
+}
+```
+4. Save it as a fasta file named *orf.fa*
+```{r}
+writeXStringSet(...)
+```
+
+## Exercise 2: Construct an HMM to find ORFs
+
+Implement an HMM according to the schema below
+
+![](HMM_schema.jpeg)
+
+* The states **S1, S2, S3** represent the 3 consecutive nucleotides of a start codon, **E1, E21, E22, E32, E33** represent the
+[3 possible stop codons](https://en.wikipedia.org/wiki/Stop_codon), **B** is background and **I[123]** are "inner" codons.
+* The emitted symbols are nucleotides *A, C, G, T*, background and inner codons emit with uniform probabilities.
+* The emission probabilities of start or end states must be specified (easy to guess).
+* The transition probabilities not specified on the schema should be easy to guess. The probabilities must be calculated so that the 3 possible stop codons have the same probability.
+
+1. Complete the code below by filling in all matrix elements:
+```{r}
+states = c("B", "S1", "S2", "S3", "I1", "I2", "I3", "E1", "E21", "E22","E31", "E32")
+nstates = length(states)
+symbols = c("A", "C", "G", "T")
+nsym = length(symbols)
+
+Emat = matrix(0, ncol=nsym, nrow=nstates, dimnames=list(states, symbols))
+Mmat = matrix(0, ncol=nstates, nrow=nstates, dimnames=list(states, states))
+```
+2. Create the corresponding [HMM object](https://www.rdocumentation.org/packages/aphid/versions/1.3.3/topics/aphid) (see code below)
+```{r}
+library("aphid")
+
+### convert DNA sequence to a list of individual characters,
+### keep only the positions 1501-1800
+seq = strsplit(as.character(genes[[1]]), '')[[1]][1501:1800]
+
+### we create an artificial "Begin" that goes directly to "B":
+### add 1 row and 1 column to Mmat
+M2 = cbind(rep(0, nstates+1), rbind(rep(0, nstates), Mmat))
+colnames(M2)[1] = "Begin"
+rownames(M2)[1] = "Begin"
+### transit from "Begin" to "B"
+M2["Begin", "B"] = 1
+
+### Emat / Mmat are in units of probability,
+### the HMM calculations are with log(probability)
+
+hmm.orf = structure(list(A=log(M2), E=log(Emat), qe=rep(.25,4)), class="HMM")
+```
+3. Plot the HMM schema (see [plot.HMM](https://www.rdocumentation.org/packages/aphid/versions/1.3.3/topics/plot.HMM)) 
+4. Run the [Viterbi algorithm](https://www.rdocumentation.org/packages/aphid/versions/1.3.3/topics/Viterbi) on the segment *1501:1800* of the human gene and display the resulting states
+```{r}
+### plot...
+
+### Viterbi algo
+hmm.vtrb = Viterbi(....)
+
+### for a simple visual display: concatenate all nucleotides into one string
+### and show the 1st letter of each state name aligned below
+vis.gene = as.character(genes[[1]][1501:1800])
+state.letter = substr(states,1,1)
+vis.hmmpath = paste(state.letter[hmm.vtrb$path+1], collapse='')
+c(vis.gene, vis.hmmpath)
+```
+
