@@ -1,0 +1,126 @@
+---
+title: "5. Population genetics: mutations, selection, drift"
+author: "EPFL - SV - BIO-463"
+date: 03/18/2025
+date-format: long
+format:
+  html:
+    embed-resources: true
+  pdf:
+    papersize: a4
+    fig-width: 6
+    fig-height: 4
+format-links: false
+---
+
+
+## Exercise 1 - Determining mutation rates: the fluctuation test
+
+[webSalvador](https://websalvador.eeeeeric.com/) is a webserver that can be used to estimate mutation rates using the fluctuation test, based on the Luria-Delbrück experiment.
+It relies on the R package [rSalvador](https://github.com/eeeeeric/rSalvador), described in [a paper by Qi Zheng](https://academic.oup.com/g3journal/article/7/12/3849/6027424).
+In this problem, we will briefly explore webSalvador. To know more, you can consult the reference and the R package.
+
+To use webSalvador, the following experimental measurements are needed:
+
+* The total number Nt of cells per culture after growth (and immediately before plating), which is assumed to be the same in each replicate culture. 
+* The value of the number of mutation events before the growth phase, i.e. when starting a culture. Usually N0, the number of cells used to start a culture, is small enough to ensure that it is zero, and here we will make this assumption throughout.
+* The list of the number of mutants in each culture, measured as the number of colonies observed after plating for each culture.
+
+webSalvador is based on the maximum likelihood inference method, and its main goal is to infer the value of the mutation praobability per division.
+
+1. A parameter inferred from data by webSalvador is m, the expected (average) number of mutation events that occurred in each culture. Assume that at each division during the growth phase, there is a probability p that a wild-type cell gives rise to one mutant daughter cell (out of two daughter cells). How can you determine the mutation probability p from m? 
+
+2. Use webSalvador in "Basic Lea-Coulson" estimation mode, with the default data. It will provide estimates of m and p. Check that they satisfy the equation you obtained in question 1. What estimates do you expect if Nt was 10 times larger but the list of the number of mutants in each culture was the same? Check that your expectation is correct by using webSalvador.
+
+3. webSalvador also provides the limits of a confidence interval for m and p. Qualitatively, how do you expect the size of the confidence interval to change in a hypothetical case where twice more cultures were considered and the exact same list of numbers of mutants was obtained twice? Check that your expectation is correct by using webSalvador.
+
+4. In basic estimates, all mutants are assumed to give rise to a colony and to be counted, which corresponds to a plating efficiency of 1. In practice, the plating efficiency epsilon is often below 1, for instance because only a fraction of each culture is plated. Qualitatively, what do you expect for the estimate of p if the default data is used, except that a plating efficiency epsilon=0.1 is assumed? Check that your expectation is correct by using webSalvador in "Lea-Coulson, epsilon<1" estimation mode.
+
+5. In basic estimates, mutants are assumed to be neutral. In other words, their relative fitness w is assumed to be 1. Qualitatively, what do you expect for the estimate of p if the default data is used, except that w>1 (for instance w=1.5)? Check that your expectation is correct by using webSalvador in "Mandelbrot-Koch" estimation mode.
+
+{{< pagebreak >}}
+
+##  Exercise 2 - Drift and selection: simulating the Wright-Fisher model
+
+In this exercise, we will simulate the evolution of a population in the Wright-Fisher model using R.
+
+1. A key ingredient of the Wright-Fisher model is binomial sampling. For this, you can rely on the R function *rbinom*. Using this function, perform binomial sampling for a binomial distribution with parameters size=10 (number of trials) and prob=0.1 (probability of success on each trial). Sample n=1000 values from this distribution, compute their mean and standard deviation, and plot the resulting histograms of the values obtained.
+
+2. Simulate the Wright-Fisher process for a haploid and asexual population of 10 individuals starting with 1 neutral mutant for 150 generations (consider the initial state as generation 1 for simplicity). Plot the fraction of mutants in the population versus the number of generations. Run your simulation several times. Observe the results and comment.
+
+3. Construct a code with a loop that allows you to simulate 100 realizations of the Wright-Fisher process and to plot the fraction of mutants in the population versus the number of generations in these different realizations on the same plot. The hypotheses are the same as above. Run your simulation in the following conditions:
+- 10 individuals starting with 1 neutral mutant for 150 generations (as above);
+- 1000 individuals starting with 1 neutral mutant for 150 generations;
+- 10 individuals starting with 5 neutral mutants for 150 generations;
+- 1000 individuals starting with 500 neutral mutants for 150 generations.
+
+Compare the results in these 4 situations and comment. What should happen after a sufficiently long time (you can check this by increasing the number of generations considered)? What is the impact of population size? Of the initial number of mutants? 
+
+4. Now we will include the effect of natural selection, assuming that the mutants have a relative fitness advantage s compared to the wild-type individuals (if s<0, then the mutant has a selective disadvantage).
+What do you need to change in your code to include selection? Write a new version of the code from question 3, allowing you to simulate 100 realizations of the Wright-Fisher process and to plot the fraction of mutants in the population versus the number of generations in these different realizations on the same plot. Run your simulation in the following conditions:
+- 1000 individuals starting with 1 mutant with s=0.1 for 150 generations;
+- 1000 individuals starting with 500 neutral mutants with s=0.1 for 150 generations;
+- 1000 individuals starting with 500 neutral mutants with s=0.0001 for 150 generations.
+
+Compare the results in these 3 situations and comment. What is the impact of the initial number of mutants? Of the value of s? What should s be compared to in order to predict whether the system will behave as in the 2nd case studied in this question or as in the 3rd one?
+
+
+{{< pagebreak >}}
+
+##  Exercise 3 - Drift, selection and mutation
+
+In this exercise, we will start from our simulation of the Wright-Fisher process, but we will include mutations, and consider the case where more than two types can exist in the population at a given time. 
+To include the case where more than two types can exist in the population at a given time, we will replace the binomial sampling in the Wright-Fisher process by multinomial sampling, which allows to sample the number of individuals of each strain at generation n+1 starting from the number of individuals of each strain (type) at generation n. For this, the function *rmultinom* can be used. The probability of sampling an individual from a given strain to form generation n+1 is proportional to the fraction of this strain in generation n times the fitness of this strain.
+To model mutations, we will consider that after a generation forms, each individual has a probability mu to mutate to another type. To simplify the description, we will consider that there are n_strains different strains (types) and that for all k, strain k can mutate to strain k+1, but the last one (strain n_strains) does not mutate. 
+We will start with only individuals of strain 1, and assume there are n_strains=5 different possible strains.
+
+1. What is the probability distribution of the number of mutants from type 1 to type 2 at a given generation?
+
+2. This question has two different versions that you can choose from:
+2a. Write a code to simulate the process described above.
+2b. Study the code given below.
+
+3. Consider the case where each strain is fitter than the previous one, specifically with fitnesses 1, 1.1, 1.2, 1.3, 1.4. 
+Using a population size of 1000 individuals and a mutation probability mu=0.00001, simulate the evolution of the population for n_gen=6000 generations. Plot the fraction of each strain in the population. Comment on the results. How many strains usually exist in the population in this case? What condition on mu should hold for the population to have such an evolution?
+
+```{r}
+size=1000
+n_strains=5
+fitness=c(1, 1.1, 1.2, 1.3, 1.4) # or c(1, 1.1, 1, 1.3, 1.4) with mu=0.001 and n_gen=3000
+mu=0.00001 # or mu=0.001 with n_gen=300
+prob = numeric(n_strains)
+strain_nmut = numeric(n_strains)
+strain_nmut[n_strains] = 0 #last type is assumed not to mutate
+strain_num_aftermut = numeric(n_strains)
+n_gen=6000
+strain_frac = matrix(nrow=n_gen,ncol=n_strains)
+strain_frac[1,1]=1
+
+for(i in 2:n_strains){
+  strain_frac[1,i]=0
+}
+
+for(j in 2:n_gen){
+  for(i in 1:n_strains){
+    prob[i]=fitness[i]*strain_frac[j-1,i] #in principle we should normalize so that the entries of prob sum to one, but rmultinom does not require this
+  }
+  strain_num_beforemut=t( rmultinom( 1, size, prob ) )
+  strain_num_aftermut=strain_num_beforemut
+  for(i in 1:(n_strains-1)){
+    strain_nmut[i]=rbinom( 1, strain_num_beforemut[i], mu )
+  }
+  for(i in 1:(n_strains-1)){ #last type is assumed not to mutate
+    strain_num_aftermut[i]=strain_num_aftermut[i]-strain_nmut[i]
+    strain_num_aftermut[i+1]=strain_num_aftermut[i+1]+strain_nmut[i]
+  }
+  strain_frac[j, ] = strain_num_aftermut / size
+}
+
+matplot(1:n_gen, strain_frac, pch=20, type="l", lty="solid", main='Wright-Fisher model with selection and mutations', xlab='Generation', ylab='Mutant fraction')
+labels = sprintf('Strain %2d', 1:n_strains)
+legend("topright", lty="solid", col=1:n_strains, labels)
+```
+
+4. Same question but using a mutation probability mu=0.001, and n_gen=300 generations.
+
+5. Now consider that the fitnesses of the successive strains are 1, 1.1, 1, 1.3, 1.4. What is special in the step going from the second to the third strain? Simulate the process for a mutation probability mu=0.0005, and n_gen=5000 generations. Comment, giving special attention to the third strain. How does the fourth strain emerge? What would happen if mu was much smaller?
