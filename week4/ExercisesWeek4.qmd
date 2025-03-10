@@ -19,9 +19,9 @@ format-links: false
   
 The file HA_sequences.fasta contains a list of nucleotide sequences of the gene coding for hemagluttinin (HA), from influenza viruses sampled between 1968 and 2005. In the fasta format, each sequence comes with a *header* that contains annotations: here, the header contains the year of sampling.
 
-1. Load the sequences and inspect the data. In R, you may use the *seqinr::read.fasta* function for this, part of the *seqinr* package. How many sequences are there? What is the length of each sequence? 
+1. Load the sequences and inspect the data. In R, you may use the *seqinr::read.fasta* function for this, part of the *[seqinr](https://www.rdocumentation.org/packages/seqinr/versions/4.2-36)* package. How many sequences are there? What is the length of each sequence? 
   
-2. Calculate the Hamming distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. In R, you may use the *DescTools::StrDist* function for this, part of the *DescTools* package. Remark 1: this package requires R version >= 4.2.0. Remark 2: remember that the Hamming distance should be between 0 and 1. Also calculate the Jukes-Cantor distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. Plot both of them versus the sampling year. Comment: what is the trend of these distances? What fraction of the HA gene has changed due to mutations during this 37 year period? How many mutations per site on average does this correspond to?  
+2. Calculate the Hamming distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. In R, you may use the *[DescTools::StrDist](https://www.rdocumentation.org/packages/DescTools/versions/0.99.58/topics/StrDist)* function for this, part of the *DescTools* package. Remark 1: this package requires R version >= 4.2.0. Remark 2: remember that the Hamming distance should be between 0 and 1. Also calculate the Jukes-Cantor distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. Plot both of them versus the sampling year. Comment: what is the trend of these distances? What fraction of the HA gene has changed due to mutations during this 37 year period? How many mutations per site on average does this correspond to?  
   
 3. If you wanted to construct a phylogenetic tree from the sequences considered here, do you think that the UPGMA method would give a reasonable result? Justify your answer. You do not need to construct a tree.
 
@@ -33,7 +33,7 @@ The file HA_sequences.fasta contains a list of nucleotide sequences of the gene 
 ##  Exercise 2 - Phylogeny reconstruction for influenza hemagglutinin
 
 In this exercise, we will still consider the influenza virus, and the sequences coding for hemagglutinin, but we will focus on a smaller set of sequences from H3N2 influenza viruses collected in the US from 1993 to 2008. They are in the file "US_sequences_93_08.fasta". Since the headers are not very informative, they are supplemented by a file of annotations called "US_sequences_93_08_annotations.csv".
-We will use the *ape: Analyses of Phylogenetics and Evolution* package. If necessary, please install it, as well as the *adegenet* package.
+We will use the *[ape: Analyses of Phylogenetics and Evolution](https://www.rdocumentation.org/packages/ape/versions/5.8-1)* package. If necessary, please install it, as well as the *[adegenet](https://www.rdocumentation.org/packages/adegenet/versions/2.1.11)* package.
 
 1. Load the sequences and inspect the data. For the data format to be easy to use with *ape*, this time you can use *read.dna* for this. Load the annotations too, and inspect them. You can use *read.csv* for this.
 
