@@ -1,0 +1,74 @@
+---
+title: "4. Molecular evolution and phylogeny inference"
+author: "EPFL - SV - BIO-463"
+date: 03/11/2025
+date-format: long
+format:
+  html:
+    embed-resources: true
+  pdf:
+    papersize: a4
+    fig-width: 6
+    fig-height: 4
+format-links: false
+---
+  
+##  Exercise 1 - Molecular evolution in the flu virus
+  
+*Note: this exercise was part of a graded assignment for this class in a previous year.*
+  
+The file HA_sequences.fasta contains a list of nucleotide sequences of the gene coding for hemagluttinin (HA), from influenza viruses sampled between 1968 and 2005. In the fasta format, each sequence comes with a *header* that contains annotations: here, the header contains the year of sampling.
+
+1. Load the sequences and inspect the data. In R, you may use the *seqinr::read.fasta* function for this, part of the *[seqinr](https://www.rdocumentation.org/packages/seqinr/versions/4.2-36)* package. How many sequences are there? What is the length of each sequence? 
+
+Hint: You can use the functions *getAnnot()*, *getSequence* or *getLength()*  within the *seqinr* toolbox to extract the header, sequence or length of a sequence respectively.
+  
+2. Calculate the Hamming distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. In R, you may use the *[DescTools::StrDist](https://www.rdocumentation.org/packages/DescTools/versions/0.99.58/topics/StrDist)* function for this, part of the *DescTools* package. Remark 1: this package requires R version >= 4.2.0. Remark 2: remember that the Hamming distance should be between 0 and 1. Also calculate the Jukes-Cantor distance between the first sequence (A/Aichi/2/1968) and each of the other sequences. Plot both of them versus the sampling year. Comment: what is the trend of these distances? What fraction of the HA gene has changed due to mutations during this 37 year period? How many mutations per site on average does this correspond to?  
+  
+3. If you wanted to construct a phylogenetic tree from the sequences considered here, do you think that the UPGMA method would give a reasonable result? Justify your answer. You do not need to construct a tree.
+
+4. Calculate the Hamming distances between each pair of strains from the same year. Do this for all years, obtaining a list of Hamming distances between strains from the same year. (This calculation takes some time.) Plot the distribution of all these distances in a single histogram (including the data corresponding to all years). Calculate the mean and the maximum value of these distances. Comment: compare to the results from question 2. 
+
+Hint: To plot a histogram, one option is to use the *[hist()](https://www.rdocumentation.org/packages/graphics/versions/3.6.2/topics/hist)* function.
+
+5. Focusing on Hamming distances for simplicity, estimate how long it would take for sequences to accumulate a number of differences corresponding to the average distance between sequences from the same year.
+
+
+##  Exercise 2 - Phylogeny reconstruction for influenza hemagglutinin
+
+In this exercise, we will still consider the influenza virus, and the sequences coding for hemagglutinin, but we will focus on a smaller set of sequences from H3N2 influenza viruses collected in the US from 1993 to 2008. They are in the file "US_sequences_93_08.fasta". Since the headers are not very informative, they are supplemented by a file of annotations called "US_sequences_93_08_annotations.csv".
+We will use the *[ape: Analyses of Phylogenetics and Evolution](https://www.rdocumentation.org/packages/ape/versions/5.8-1)* package. If necessary, please install it, as well as the *[adegenet](https://www.rdocumentation.org/packages/adegenet/versions/2.1.11)* package.
+
+1. Load the sequences and inspect the data. For the data format to be easy to use with *ape*, this time you can use *read.dna* for this. Load the annotations too, and inspect them. You can use *read.csv* for this.
+
+2. Calculate all pairwise distances between sequences using the Jukes-Cantor model. For this you can use *dist.dna*. Next, infer a neighbor joining (NJ) tree from this list of distances, using *bionj*, and then *ladderize*. Plot the tree using *plot*.
+
+3. For a more informative data visualization, we will now aim at annotating each leaf of the tree with the year that the sequence was collected in. Use data from the annotation file for this, and represent the year visually by a color gradient as well as by a tip label for each leaf. 
+
+Hint 1: you can use the *tiplabels()* function from the ape package to add the year to the tip of the tree. Use the "bg" flag within *tiplables()* to provide the color for the tip (see also Hint 2).
+
+Hint 2: you can use the *num2col()* function from the *adegenet* package to convert a numeric value (year) to a color based on a user-defined color palette (col.pal).
+
+4. Until now, the tree was unrooted. Since each sequence is annotated with the year it was collected in, we can use one of the oldest sequences to define the root. After inspecting the annotations, root the tree using *root*. Comment on the tree you obtained.
+
+5. To assess the quality of the NJ tree you constructed, evaluate the patristic distances (=distances along the tree, based on the branch lengths) using *cophenetic*, and compare them to the Jukes-Cantor distances between sequences you determined in question 2. For this, you can plot the patristic distances versus the Jukes-Cantor distances between sequences. Comment on the resulting plot.   
+
+6. Evaluate the confidence in each node using the bootstrap approach, by using the function *boot.phylo*. Comment on the bootstrap values obtained, given that the maximum possible value is 100.
+
+
+## Exercise 3: Plot, analyze and manipulate a gene tree
+
+Here, we will start from a gene tree covering many species that was constructed using a specialized maximum likelihood tree inference software, specifically RaxML. We will continue to use the R package *ape* to plot, annotate and manipulate this tree.
+
+1. Load the file *RAxML_bipartitions.Homologs* using *[read.tree](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/read.tree)* and plot the tree using *[plot.phylo](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/plot.phylo)*
+
+2. Re-root the tree at the base of all bird genes (find all tree tips corresponding to *penguin* using *[grep](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/grep)*, then *[getMRCA](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/mrca)* and *[root](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/root)*. Then plot the new tree using *[plot.phylo](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/plot.phylo)*
+
+3. Display the bootstrap values > 80 with *[nodelabels](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/nodelabels)*. Annotate the tree by displaying the *Barn_owl*, *human* and *Atlantic_salmon* genes in 3 different colors. Re-plot the tree showing these annotations.
+
+4. Based on this tree, how many paralogs of this gene exist in mammals, in birds and in fish? Which *rat* gene is the ortholog of *human_5187*?
+
+5. Use the methods *[drop.tip, keep.tip and extract.clade](https://www.rdocumentation.org/packages/ape/versions/5.6-2/topics/drop.tip)* to plot the following subtrees:
+a. All non-fish species (remove all *salmon*, *zebrafish* and *torafugu*)
+b. The clade containing *human_8863* and *house_mouse_18628* (a clade contains all descendents of the last common ancestor of these 2 leaves)
+c. Only the birds (*penguins* and *owls*)
