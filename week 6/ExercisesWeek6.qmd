@@ -63,7 +63,7 @@ head(annotations)
 
 ```{r}
 #| fig-height: 24
-#| fig-width: 16
+#| fig-width: 20
 
 # Calculate pairwise distances using Jukes-Cantor model
 dist_matrix <- dist.dna(sequences, model = "JC69")
@@ -77,20 +77,35 @@ rooted_tree <- root(nj_tree, outgroup = 1, resolve.root = TRUE)
 # Ladderize the tree for better visualization
 rooted_tree <- ladderize(rooted_tree)
 
+# Manually expand the horizontal component of the edges
+stretched_tree <- rooted_tree
+
+# Find the reference branch index
+ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
+
+# Use a moderate stretching factor
+for (i in 1:nrow(stretched_tree$edge)) {
+  if (i != ref_edge_idx) {
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 6
+  } else {
+    # Slightly shorten the reference branch
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.8
+  }
+}
+
 # Extract the part of the tip labels after the last period
-clean_tip_labels <- sapply(rooted_tree$tip.label, function(label) {
+clean_tip_labels <- sapply(stretched_tree$tip.label, function(label) {
   parts <- strsplit(label, "\\.")[[1]]
-  return(parts[length(parts)])  # Get the last part after the period
+  return(parts[length(parts)])
 })
 
-# Now match these cleaned tip labels with annotation names
+# Match cleaned tip labels with annotation names
 day_lookup <- annotations$DaysFromSeroconversion
 names(day_lookup) <- annotations$Name
 
 # Get days for each tip
 tip_days <- numeric(length(clean_tip_labels))
 for (i in 1:length(clean_tip_labels)) {
-  # Find the annotation name that contains the clean tip label
   matches <- grep(clean_tip_labels[i], annotations$Name, fixed = TRUE)
   
   if (length(matches) > 0) {
@@ -100,43 +115,40 @@ for (i in 1:length(clean_tip_labels)) {
   }
 }
 
-# Print count of matched days for debugging
-print(table(is.na(tip_days)))
-print(table(tip_days))
-
 # Define categories for coloring
 day_categories <- rep("Reference", length(tip_days))
 day_categories[!is.na(tip_days) & tip_days == 323] <- "Early"
 day_categories[!is.na(tip_days) & tip_days > 323 & tip_days < 1600] <- "Intermediate"
 day_categories[!is.na(tip_days) & tip_days >= 1600] <- "Late"
 
-# Print count by category for verification
-print(table(day_categories))
-
 # Set colors based on categories
 color_mapping <- c(
   "Reference" = "darkblue",
   "Early" = "green3", 
-  "Intermediate" = "orange", 
+  "Intermediate" = "orange",
   "Late" = "red"
 )
 
 tip_colors <- color_mapping[day_categories]
 
-# Set up the plotting area
-par(mar = c(1, 1, 3, 1), xpd = TRUE)
+# Set up plotting area with more space on the right
+par(mar = c(1, 1, 3, 8), xpd = TRUE)
 
-# Plot the tree with constrained x-axis
-plot(rooted_tree, show.tip.label = FALSE, 
+# Plot the stretched tree
+plot(stretched_tree, show.tip.label = FALSE, 
      main = "HIV Phylogenetic Tree Colored by Days from Seroconversion",
-     cex = 0.8, 
-     x.lim = c(0, 0.6))  # Limit x-axis to prevent overlap
+     cex = 0.8,
+     edge.width = 1.2,
+     direction = "rightwards")
 
 # Add colored dots for each tip
 tiplabels(pch = 19, col = tip_colors, cex = 1.2)
 
-# Create a legend with better positioning
-legend(x = "topright", 
+# Create a legend positioned lower on the right side (using x,y coordinates)
+# First get the plot dimensions
+plot_dims <- par("usr")
+legend(x = plot_dims[2] * 0.8,  # Horizontal
+       y = plot_dims[4] * 0.95,   # Vertical
        legend = c("Reference", 
                   "Early (323 days)", 
                   "Intermediate (1072-1394 days)", 
@@ -145,9 +157,69 @@ legend(x = "topright",
        col = color_mapping,
        cex = 1.2, 
        bty = "n",
-       inset = c(0.05, 0.05),
        title = "Days from Seroconversion")
 ```
+```{r}
+# DEBUGGING CONSOLE OUTPUT
+
+# Basic counts by time category
+print("Count of sequences by days category:")
+print(table(day_categories))
+
+# Look for exceptions to temporal patterns
+# Calculate mean distance from root for each time category
+node_depths <- node.depth.edgelength(rooted_tree)
+tip_depths <- node_depths[1:length(rooted_tree$tip.label)]
+names(tip_depths) <- rooted_tree$tip.label
+
+# Group depths by time category
+depths_by_category <- list()
+for (cat in unique(day_categories)) {
+  cat_indices <- which(day_categories == cat)
+  depths_by_category[[cat]] <- tip_depths[cat_indices]
+}
+
+# Print mean depth by category
+print("Mean evolutionary distance from root by category:")
+for (cat in names(depths_by_category)) {
+  print(paste(cat, ":", mean(depths_by_category[[cat]])))
+}
+
+# Find outliers - early sequences that are deeply nested or late sequences near the root
+early_threshold <- quantile(depths_by_category[["Early"]], 0.75)
+late_threshold <- quantile(depths_by_category[["Late"]], 0.25)
+
+print("Potential outliers - Early sequences deeper than expected:")
+deep_early <- which(day_categories == "Early" & tip_depths > early_threshold)
+if (length(deep_early) > 0) {
+  print(rooted_tree$tip.label[deep_early])
+}
+
+print("Potential outliers - Late sequences shallower than expected:")
+shallow_late <- which(day_categories == "Late" & tip_depths < late_threshold)
+if (length(shallow_late) > 0) {
+  print(rooted_tree$tip.label[shallow_late])
+}
+
+# Check monophyly of time points
+print("Are time categories monophyletic?")
+for (cat in c("Early", "Intermediate", "Late")) {
+  tips <- which(day_categories == cat)
+  is_mono <- is.monophyletic(rooted_tree, tips)
+  print(paste(cat, "is monophyletic:", is_mono))
+}
+
+# Print some information to help with question 6
+if (exists("sequences2")) {
+  # For question 6
+  print("Information for second patient (sequences2):")
+  seq0_indices <- which(annotations2$DaysFromSeroconversion == 0)
+  if (length(seq0_indices) > 0) {
+    print(paste("Number of sequences at seroconversion (0 days):", length(seq0_indices)))
+  }
+}
+```
+
 
 3. Comment on the tree obtained: 
 - How are sequences collected at recent time points positioned on the tree in general? 
