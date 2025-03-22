@@ -36,6 +36,23 @@ The data file "sequences1.fasta" contains sequences extracted from HIV genomes t
 
 1. Load the sequences using *read.dna*. Load the annotations using *read.csv*, and inspect them, e.g. by displaying the first few rows of annotations. 
 
+```{r}
+# Load required libraries
+#install.packages("adegenet")
+library(ape)
+library(adegenet)
+
+# Load the sequences
+sequences <- read.dna("sequences1.fasta", format = "fasta")
+
+# Load annotations
+annotations <- read.csv("annot1.csv")
+
+# Inspect the first few rows of annotations
+head(annotations)
+```
+
+
 2. In this question, we will build a phylogenetic tree for these HIV sequences:
 - Calculate all pairwise distances between sequences using *dist.dna* under the Jukes-Cantor model. 
 - Next, infer a neighbor joining (NJ) tree from this list of distances using *bionj*. 
