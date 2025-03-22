@@ -300,123 +300,213 @@ The data file "sequences2.fasta" contains sequences extracted from HIV genomes t
 *Clue for question 4:* for visualization, you can tune figure height and width, e.g. by including the following two lines at the beginning of your code: "#\| fig-height: 12" and "#\| fig-width: 12".
 
 ```{r}
-#| fig-height: 12
-#| fig-width: 12
+# Load the sequences
+sequences <- read.dna("sequences2.fasta", format = "fasta")
 
-# Load the sequences for the second patient
-sequences2 <- read.dna("sequences2.fasta", format = "fasta")
+# Load annotations
+annotations <- read.csv("annot2.csv")
 
-# Load annotations for the second patient
-annotations2 <- read.csv("annot2.csv")
+
+#| fig-height: 15
+#| fig-width: 15
 
 # Calculate pairwise distances using Jukes-Cantor model
-dist_matrix2 <- dist.dna(sequences2, model = "JC69")
+dist_matrix <- dist.dna(sequences, model = "JC69")
 
 # Infer neighbor joining tree
-nj_tree2 <- bionj(dist_matrix2)
+nj_tree <- bionj(dist_matrix)
 
 # Root the tree using the reference sequence
-rooted_tree2 <- root(nj_tree2, outgroup = 1, resolve.root = TRUE)
+rooted_tree <- root(nj_tree, outgroup = 1, resolve.root = TRUE)
 
 # Ladderize the tree for better visualization
-rooted_tree2 <- ladderize(rooted_tree2)
+rooted_tree <- ladderize(rooted_tree)
 
 # Manually expand the horizontal component of the edges
-stretched_tree2 <- rooted_tree2
+stretched_tree <- rooted_tree
 
 # Find the reference branch index
-ref_edge_idx2 <- which(stretched_tree2$edge[,2] == 1)
+ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
 
 # Use a moderate stretching factor
-for (i in 1:nrow(stretched_tree2$edge)) {
-  if (i != ref_edge_idx2) {
-    stretched_tree2$edge.length[i] <- stretched_tree2$edge.length[i] * 6
+for (i in 1:nrow(stretched_tree$edge)) {
+  if (i != ref_edge_idx) {
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 6
   } else {
     # Slightly shorten the reference branch
-    stretched_tree2$edge.length[i] <- stretched_tree2$edge.length[i] * 0.8
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.8
   }
 }
 
-# Extract the part of the tip labels after the last period
-clean_tip_labels2 <- sapply(stretched_tree2$tip.label, function(label) {
-  parts <- strsplit(label, "\\.")[[1]]
-  return(parts[length(parts)])
-})
-
-# Match cleaned tip labels with annotation names
-day_lookup2 <- annotations2$DaysFromSeroconversion
-names(day_lookup2) <- annotations2$Name
-
-# Get days for each tip
-tip_days2 <- numeric(length(clean_tip_labels2))
-for (i in 1:length(clean_tip_labels2)) {
-  matches <- grep(clean_tip_labels2[i], annotations2$Name, fixed = TRUE)
+# Get days for each tip - better matching strategy
+tip_days <- numeric(length(stretched_tree$tip.label))
+for (i in 1:length(stretched_tree$tip.label)) {
+  current_tip <- stretched_tree$tip.label[i]
   
-  if (length(matches) > 0) {
-    tip_days2[i] <- annotations2$DaysFromSeroconversion[matches[1]]
-  } else {
-    tip_days2[i] <- NA  # Set NA for reference sequence
+  # Look for substring matches in annotation names
+  for (j in 1:nrow(annotations)) {
+    if (grepl(annotations$Name[j], current_tip, fixed = TRUE) || 
+        grepl(current_tip, annotations$Name[j], fixed = TRUE)) {
+      tip_days[i] <- annotations$DaysFromSeroconversion[j]
+      break
+    }
+  }
+  
+  # Special case for reference sequence
+  if (grepl("HXB2", current_tip) || i == 1) {
+    tip_days[i] <- NA
   }
 }
 
-# Define categories for coloring based on actual days in dataset
-day_categories2 <- rep("Reference", length(tip_days2))
-day_categories2[!is.na(tip_days2) & tip_days2 == 0] <- "Seroconversion"
-day_categories2[!is.na(tip_days2) & tip_days2 > 0 & tip_days2 <= 50] <- "Early"
-day_categories2[!is.na(tip_days2) & tip_days2 > 50 & tip_days2 <= 120] <- "Intermediate"
-day_categories2[!is.na(tip_days2) & tip_days2 > 120] <- "Late"
+# Print summary to debug
+print(paste("Number of tips with assigned days:", sum(!is.na(tip_days))))
+print(paste("Range of days:", min(tip_days, na.rm = TRUE), "to", max(tip_days, na.rm = TRUE)))
 
-# Set colors based on categories
-color_mapping2 <- c(
-  "Reference" = "darkblue",
-  "Seroconversion" = "purple",
-  "Early" = "green3", 
-  "Intermediate" = "orange",
-  "Late" = "red"
-)
+# Set up color gradient (correctly ordered)
+library(grDevices)
+# Fix the gradient: purple to magenta to orange
+color_gradient <- colorRampPalette(c("#B300F2", "#DE0099", "#FF7E1D"))
 
-tip_colors2 <- color_mapping2[day_categories2]
+# Generate colors based on days
+tip_colors <- rep("darkblue", length(tip_days))  # Default for reference
+
+# Only proceed if we have valid days
+if (sum(!is.na(tip_days)) > 0) {
+  max_days <- max(tip_days, na.rm = TRUE)
+  min_days <- min(tip_days, na.rm = TRUE)
+  
+  # Scale days to 0-100 for color index (handle case where all days are the same)
+  day_range <- max_days - min_days
+  if (day_range > 0) {
+    for (i in 1:length(tip_days)) {
+      if (!is.na(tip_days[i])) {
+        # Scale to 1-100 range
+        scaled_value <- 1 + round(99 * (tip_days[i] - min_days) / day_range)
+        tip_colors[i] <- color_gradient(100)[scaled_value]
+      }
+    }
+  } else {
+    # If all days are the same, use middle color
+    tip_colors[!is.na(tip_days)] <- color_gradient(100)[50]
+  }
+}
 
 # Set up plotting area with more space on the right
-par(mar = c(1, 1, 3, 8), xpd = TRUE)
+par(mar = c(1, 5, 1, 5), xpd = TRUE)  # Increased right margin
 
 # Plot the stretched tree
-plot(stretched_tree2, show.tip.label = FALSE, 
-     main = "HIV Phylogenetic Tree for Second Patient\nColored by Days from Seroconversion",
+plot(stretched_tree, show.tip.label = FALSE, 
+     main = "HIV Phylogenetic Tree Colored by Days from Seroconversion",
      cex = 0.8,
      edge.width = 1.2,
      direction = "rightwards")
 
 # Add colored dots for each tip
-tiplabels(pch = 19, col = tip_colors2, cex = 1.2)
+tiplabels(pch = 19, col = tip_colors, cex = 1.2)
 
-# Create a legend positioned on the right side
+# Add days labels next to the tips
+tiplabels(
+  text = ifelse(is.na(tip_days), "", as.character(tip_days)),
+  adj = c(-0.5, 0.5),
+  frame = "none",
+  cex = 0.7,
+  col = "black"
+)
+
+# Add "Reference" label to the reference sequence tip (should be tip 1)
+# First, identify which tip number is the reference
+ref_tip_index <- 1  # By convention in this dataset
+# Add a special text label for the reference tip
+tiplabels(
+  text = "Reference",
+  tip = ref_tip_index,
+  adj = c(-0.2, 0.5),  # Position the text to the right of the tip
+  frame = "none",
+  cex = 0.9,
+  col = "darkblue",
+  font = 2  # Bold text
+)
+
+# SIMPLIFIED LEGEND WITHOUT FRAME AND REFERENCE
+# Get plot dimensions
 plot_dims <- par("usr")
-legend(x = plot_dims[2] * 0.8,
-       y = plot_dims[4] * 0.95,
-       legend = c("Reference", 
-                  "Seroconversion (0 days)",
-                  "Early (31 days)", 
-                  "Intermediate (59 days)", 
-                  "Late (115-199 days)"),
-       pch = 19, 
-       col = color_mapping2,
-       cex = 1.2, 
-       bty = "n",
-       title = "Days from Seroconversion")
 
-# Analysis for question 5
-print(paste("Number of sequences >100 days after seroconversion:", 
-           sum(!is.na(tip_days2) & tip_days2 > 100)))
+# Position parameters for legend
+legend_x <- plot_dims[2] * 1.03  # Positioned further to the right 
+legend_y_top <- plot_dims[4] * 0.7  # Positioned in upper part
+legend_width <- (plot_dims[2] - plot_dims[1]) * 0.02  # Very narrow, proportional width
+legend_height <- (plot_dims[4] - plot_dims[3]) * 0.3  # Shorter height
 
-# Calculate mean distance from root for each time category
-node_depths2 <- node.depth.edgelength(rooted_tree2)
-tip_depths2 <- node_depths2[1:length(rooted_tree2$tip.label)]
-names(tip_depths2) <- rooted_tree2$tip.label
+# Increase spacing between title and gradient bar
+title_spacing <- legend_width * 1900  # Much larger spacing
 
-# Print number of sequences at each time point
-print("Number of sequences by time point:")
-print(table(day_categories2))
+# Add title for legend with significantly more space above the bar
+text(
+  legend_x + legend_width,
+  legend_y_top + title_spacing,  # Greatly increased vertical space
+  "Days after\nseroconversion",
+  cex = 0.9,
+  font = 2
+)
+
+# Draw gradient bar
+gradient_x <- legend_x + legend_width/2
+gradient_y_top <- legend_y_top
+gradient_y_bottom <- legend_y_top - legend_height
+gradient_bar_width <- legend_width/2
+
+# Create gradient segments
+num_segments <- 50  # More segments for smoother gradient
+gradient_heights <- seq(gradient_y_bottom, gradient_y_top, length.out = num_segments+1)
+gradient_colors <- color_gradient(num_segments)
+
+for (i in 1:num_segments) {
+  rect(
+    gradient_x - gradient_bar_width,
+    gradient_heights[i],
+    gradient_x + gradient_bar_width,
+    gradient_heights[i+1],
+    col = gradient_colors[i],
+    border = NA
+  )
+}
+
+# Set vertical spacing between labels to avoid overlap
+vertical_spacing <- legend_height / 5
+
+# Define key day values to show with better spacing
+key_days <- c(199, 59, 31, 0)
+ref_y_positions <- c(
+  gradient_y_top,                        # 1632 (top)
+  gradient_y_top - vertical_spacing,     # 1394
+  gradient_y_top - 2.5*vertical_spacing, # 1072 
+  gradient_y_bottom                      # 323 (bottom)
+)
+
+# Add tick marks and day labels with appropriate spacing
+for (i in 1:length(key_days)) {
+  day <- key_days[i]
+  y_pos <- ref_y_positions[i]
+  
+  # Add tick mark
+  segments(
+    gradient_x + gradient_bar_width,
+    y_pos,
+    gradient_x + gradient_bar_width * 2,
+    y_pos,
+    lwd = 1
+  )
+  
+  # Add day value label
+  text(
+    gradient_x + gradient_bar_width * 2.5,
+    y_pos,
+    labels = as.character(day),
+    pos = 4,
+    cex = 0.8,
+    offset = 0.1
+  )
+}
 ```
 
 5.  Comment on the tree obtained:
