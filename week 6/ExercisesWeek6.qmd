@@ -61,6 +61,54 @@ head(annotations)
 
 *Clue for question 2:* for visualization, you can tune figure height and width, e.g. by including the following two lines at the beginning of your code: "#| fig-height: 20" and "#| fig-width: 12".
 
+```{r}
+#| fig-height: 20
+#| fig-width: 12
+
+# Calculate pairwise distances using Jukes-Cantor model
+dist_matrix <- dist.dna(sequences, model = "JC69")
+
+# Infer neighbor joining (NJ) tree
+nj_tree <- bionj(dist_matrix)
+
+# Root the tree using the first sequence (reference) as outgroup
+rooted_tree <- root(nj_tree, outgroup = 1, resolve.root = TRUE)
+
+# Ladderize the tree for better visualization
+rooted_tree <- ladderize(rooted_tree)
+
+# Extract days from seroconversion from annotations
+days <- annotations$DaysFromSeroconversion
+names(days) <- annotations$Name
+
+# Create a color palette for the gradient based on days
+# First, get the days for each tip in the tree
+tip_days <- days[rooted_tree$tip.label]
+
+# Replace NA with a distinctive value (for the reference sequence)
+tip_days[is.na(tip_days)] <- -100  # Using -100 to distinguish reference sequence
+
+# Create color palette (blue to red gradient)
+col_palette <- colorRampPalette(c("blue", "green", "yellow", "red"))
+tip_colors <- num2col(tip_days, col.pal = col_palette)
+
+# Plot the tree
+plot(rooted_tree, cex = 0.8, type = "phylogram", 
+     main = "HIV Phylogenetic Tree Colored by Days from Seroconversion")
+
+# Add tip labels showing days from seroconversion
+tiplabels(text = tip_days, bg = tip_colors, frame = "circle", cex = 0.8)
+
+# Add a legend
+legend("topright", 
+       legend = c("Reference", "Early", "Intermediate", "Late"),
+       pch = 21, 
+       pt.bg = col_palette(4), 
+       pt.cex = 2, 
+       title = "Days from Seroconversion",
+       bty = "n")
+```
+
 3. Comment on the tree obtained: 
 - How are sequences collected at recent time points positioned on the tree in general? 
 - What does this reflect? 
