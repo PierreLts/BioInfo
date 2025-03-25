@@ -511,10 +511,85 @@ for (i in 1:length(key_days)) {
 
 5.  Comment on the tree obtained:
 
+```{r}
+# Reload the annotations for the second patient
+annotations <- read.csv("annot2.csv")
+
+# Find sequences with more than 100 days after seroconversion
+late_sequences <- annotations[annotations$DaysFromSeroconversion > 100 & !is.na(annotations$DaysFromSeroconversion),]
+
+# Print count and details
+print("Sequences collected more than 100 days after seroconversion:")
+print(paste("Count:", nrow(late_sequences)))
+
+# Print the specific days values
+print("Days after seroconversion values:")
+print(unique(late_sequences$DaysFromSeroconversion))
+
+# Print the sequence names
+print("Sequence names:")
+print(late_sequences$Name)
+
+# Determine their position on the tree using previous tree data
+# Calculate average distance from root for these sequences
+late_seq_indices <- which(tip_days > 100)
+if(length(late_seq_indices) > 0) {
+  late_seq_distances <- node.depth.edgelength(stretched_tree)[late_seq_indices]
+  print("Average evolutionary distance from root for late sequences:")
+  print(mean(late_seq_distances))
+  
+  # Compare with early sequences
+  early_seq_indices <- which(tip_days <= 100 & !is.na(tip_days))
+  if(length(early_seq_indices) > 0) {
+    early_seq_distances <- node.depth.edgelength(stretched_tree)[early_seq_indices]
+    print("Average evolutionary distance from root for early sequences:")
+    print(mean(early_seq_distances))
+  }
+}
+
+# Extract the information about clustering
+if(length(late_seq_indices) > 0) {
+  print("Do late sequences form a monophyletic group?")
+  # Find MRCA of late sequences
+  if(length(late_seq_indices) > 1) {
+    late_mrca <- getMRCA(stretched_tree, late_seq_indices)
+    late_clade <- extract.clade(stretched_tree, late_mrca)
+    print(paste("Monophyletic:", length(late_clade$tip.label) == length(late_seq_indices)))
+  } else {
+    print("Only one late sequence, cannot form a clade")
+  }
+}
+```
+
 -   How many sequences collected more than 100 days after seroconversion appear on the tree?
+
+    *Only 2 sequences were collected more than 100 days after seroconversion (at days 199 and 115).*
+
 -   Where are they positioned on the tree?
+
+    *The late sequences are actually slightly closer to the root (average evolutionary distance 0.02414197) compared to early sequences (average distance 0.02507641).*
+
+    *They don't form a monophyletic group, indicating they evolved independently.*
+
 -   Is this surprising in light of the previous analysis (questions 2-3)?
+
+    *Yes, this is very surprising. In the first patient, we observed a clear pattern where sequences collected at later time points (323-1632 days) generally had greater evolutionary distances from the root, showing ongoing divergence over time.*
+
+    *In this second patient, we see the opposite pattern - the few late sequences are slightly closer to the root than early sequences, contrary to the expected evolutionary trajectory.*
+
 -   Propose a hypothesis regarding the difference between these two patients.
+
+    *The second patient dataset covers a much shorter timespan (0-199 days vs. 323-1632 days), which may be insufficient to observe directional evolution.*
+
+    *The second patient may have begun antiretroviral therapy, which can drastically alter viral evolution by suppressing replication.*
+
+    *The late sequences might represent viral variants reactivated from latent reservoirs containing earlier viral lineages.*
+
+    *The second patient might have a different immune response profile, creating different selection pressures on the virus.*
+
+    *The sampling might have been from different anatomical compartments where viral evolution proceeds at different rates.*
+
+    *The second patient might represent a case of HIV superinfection or initial infection with multiple founder viruses with different evolutionary trajectories.*
 
 6.  In this question, we will focus on sequences that were collected at seroconversion.
 
