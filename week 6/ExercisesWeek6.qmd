@@ -659,11 +659,6 @@ if(length(day0_indices) >= 2) {
 7.  For the flu virus, the mean Jukes-Cantor distance between all sequences collected across the world in a given year is 0.008 and the maximum Jukes-Cantor distance between sequences in a given year is 0.04.
 
 -   Compare these values to those observed in question 6, in orders of magnitude.
-
-**Comparison with Flu Virus:**
-
-HIV at Seroconversion (single patient
-
 -   What does this tell us about HIV evolution?
 
 *Note for question 7:* for HIV, seroconversion takes about one month after infection, and the vast majority of HIV-1 infections are initiated by a single, genetically homogeneous founder virus variant.
