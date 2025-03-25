@@ -599,9 +599,71 @@ if(length(late_seq_indices) > 0) {
 -   Plot the histogram of these distances.
 -   Calculate their mean and their maximum value.
 
+```{r}
+# Load required libraries
+library(ape)
+library(adegenet)
+
+# Load the sequences
+sequences2 <- read.dna("sequences2.fasta", format = "fasta")
+
+# First, let's check the structure of our sequences
+class(sequences2)
+typeof(sequences2)
+dim(sequences2)
+
+# Look at sequence names
+seq_names <- attr(sequences2, "dimnames")[[1]]
+cat("First 10 sequence names:", head(seq_names, 10), "\n")
+
+# Find day 0 sequences
+day0_pattern <- "\\.\\-\\.0\\.\\-\\."  # Pattern for ".-.0.-."
+day0_indices <- grep(day0_pattern, seq_names)
+cat("Day 0 sequences found:", length(day0_indices), "\n")
+
+# Create a new, clean DNAbin matrix for day 0 sequences
+if(length(day0_indices) >= 2) {
+  # Get the dimensions and structure right
+  if(is.matrix(sequences2)) {
+    # If sequences2 is a matrix (aligned sequences)
+    day0_sequences <- sequences2[day0_indices, ]
+  } else {
+    # If sequences2 is a list (potentially unaligned)
+    day0_sequences <- as.matrix(as.character(sequences2[day0_indices]))
+  }
+  
+  # Verify structure
+  cat("Structure of day0_sequences:", dim(day0_sequences), "\n")
+  
+  # Calculate distances
+  day0_distances <- dist.dna(day0_sequences, model = "JC69")
+  
+  # Plot histogram
+  hist(day0_distances, 
+       main = "Distribution of Jukes-Cantor Distances at Seroconversion (Day 0)",
+       xlab = "Jukes-Cantor Distance", 
+       col = "#DE0099",
+       breaks = 20)
+  
+  # Calculate mean and maximum
+  mean_distance <- mean(day0_distances)
+  max_distance <- max(day0_distances)
+  
+  cat("Mean Jukes-Cantor distance:", mean_distance, "\n")
+  cat("Maximum Jukes-Cantor distance:", max_distance, "\n")
+} else {
+  cat("Not enough day 0 sequences found for distance calculation\n")
+}
+```
+
 7.  For the flu virus, the mean Jukes-Cantor distance between all sequences collected across the world in a given year is 0.008 and the maximum Jukes-Cantor distance between sequences in a given year is 0.04.
 
 -   Compare these values to those observed in question 6, in orders of magnitude.
+
+**Comparison with Flu Virus:**
+
+HIV at Seroconversion (single patient
+
 -   What does this tell us about HIV evolution?
 
 *Note for question 7:* for HIV, seroconversion takes about one month after infection, and the vast majority of HIV-1 infections are initiated by a single, genetically homogeneous founder virus variant.
