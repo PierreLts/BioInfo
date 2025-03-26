@@ -602,40 +602,38 @@ if(length(late_seq_indices) > 0) {
 ```{r}
 # Load required libraries
 library(ape)
-library(adegenet)
 
 # Load the sequences
 sequences2 <- read.dna("sequences2.fasta", format = "fasta")
 
-# First, let's check the structure of our sequences
-class(sequences2)
-typeof(sequences2)
-dim(sequences2)
+# Load annotations
+annotations <- read.csv("annot2.csv")
 
-# Look at sequence names
-seq_names <- attr(sequences2, "dimnames")[[1]]
-cat("First 10 sequence names:", head(seq_names, 10), "\n")
-
-# Find day 0 sequences
-day0_pattern <- "\\.\\-\\.0\\.\\-\\."  # Pattern for ".-.0.-."
-day0_indices <- grep(day0_pattern, seq_names)
+# Find sequences with 0 days after seroconversion
+day0_indices <- which(annotations$DaysFromSeroconversion == 0 & !is.na(annotations$DaysFromSeroconversion))
+day0_names <- annotations$Name[day0_indices]
 cat("Day 0 sequences found:", length(day0_indices), "\n")
 
-# Create a new, clean DNAbin matrix for day 0 sequences
-if(length(day0_indices) >= 2) {
-  # Get the dimensions and structure right
-  if(is.matrix(sequences2)) {
-    # If sequences2 is a matrix (aligned sequences)
-    day0_sequences <- sequences2[day0_indices, ]
-  } else {
-    # If sequences2 is a list (potentially unaligned)
-    day0_sequences <- as.matrix(as.character(sequences2[day0_indices]))
+# Match sequence names to extract the correct sequences
+day0_seq_indices <- numeric(0)
+for (i in 1:length(attr(sequences2, "dimnames")[[1]])) {
+  current_seq_name <- attr(sequences2, "dimnames")[[1]][i]
+  for (day0_name in day0_names) {
+    if (grepl(day0_name, current_seq_name, fixed = TRUE) || 
+        grepl(current_seq_name, day0_name, fixed = TRUE)) {
+      day0_seq_indices <- c(day0_seq_indices, i)
+      break
+    }
   }
+}
+
+cat("Matched day 0 sequences:", length(day0_seq_indices), "\n")
+
+# Extract day 0 sequences
+if (length(day0_seq_indices) >= 2) {
+  day0_sequences <- sequences2[day0_seq_indices, ]
   
-  # Verify structure
-  cat("Structure of day0_sequences:", dim(day0_sequences), "\n")
-  
-  # Calculate distances
+  # Calculate pairwise distances
   day0_distances <- dist.dna(day0_sequences, model = "JC69")
   
   # Plot histogram
@@ -645,7 +643,7 @@ if(length(day0_indices) >= 2) {
        col = "#DE0099",
        breaks = 20)
   
-  # Calculate mean and maximum
+  # Calculate and print mean and maximum
   mean_distance <- mean(day0_distances)
   max_distance <- max(day0_distances)
   
