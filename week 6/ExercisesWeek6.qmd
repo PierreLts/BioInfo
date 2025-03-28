@@ -34,8 +34,7 @@ The data file "sequences1.fasta" contains sequences extracted from HIV genomes t
 1.  Load the sequences using *read.dna*. Load the annotations using *read.csv*, and inspect them, e.g. by displaying the first few rows of annotations.
 
 ```{r}
-# Load required libraries
-#install.packages("adegenet")
+# Load libraries
 library(ape)
 library(adegenet)
 
@@ -83,7 +82,7 @@ ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
 # Use a moderate stretching factor
 for (i in 1:nrow(stretched_tree$edge)) {
   if (i != ref_edge_idx) {
-    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 6
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 8
   } else {
     # Slightly shorten the reference branch
     stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.8
@@ -120,7 +119,7 @@ library(grDevices)
 color_gradient <- colorRampPalette(c("#B300F2", "#DE0099", "#FF7E1D"))
 
 # Generate colors based on days
-tip_colors <- rep("darkblue", length(tip_days))  # Default for reference
+tip_colors <- rep("#0066FF", length(tip_days))  # Default for reference
 
 # Only proceed if we have valid days
 if (sum(!is.na(tip_days)) > 0) {
@@ -175,7 +174,7 @@ tiplabels(
   adj = c(-0.2, 0.5),  # Position the text to the right of the tip
   frame = "none",
   cex = 0.9,
-  col = "darkblue",
+  col = "#0066FF",
   font = 2  # Bold text
 )
 
@@ -265,33 +264,33 @@ for (i in 1:length(key_days)) {
 
 -   How are sequences collected at recent time points positioned on the tree in general?
 
-*Sequences collected at more recent time points (Intermediate: 1072-1394 days and Late: 1632 days) tend to be positioned further from the root of the tree compared to the Early sequences (323 days). This creates a general pattern where evolutionary distance from the root correlates with time of collection, with deeper branches containing more recent sequences.*
+[Sequences collected at more recent time points (Intermediate: 1072-1394 days and Late: 1632 days) tend to be positioned further from the root of the tree compared to the Early sequences (323 days). This creates a general pattern where evolutionary distance from the root correlates with time of collection, with deeper branches containing more recent sequences.]{style="color:#B300F2;"}
 
 -   What does this reflect?
 
-*This pattern reflects the ongoing evolutionary process of HIV within this patient over time. It shows that HIV undergoes continuous genetic diversification and adaptation within a single host. This is consistent with HIV's high mutation rate and the selective pressures it faces from the host immune system. As time progresses, viral populations accumulate mutations and diverge further from the initial infecting strains.*
+[This pattern reflects the ongoing evolutionary process of HIV within this patient over time. It shows that HIV undergoes continuous genetic diversification and adaptation within a single host. This is consistent with HIV's high mutation rate and the selective pressures it faces from the host immune system. As time progresses, viral populations accumulate mutations and diverge further from the initial infecting strains.]{style="color:#B300F2;"}
 
 -   How many exceptions are there to this trend, and when were they collected (in days after seroconversion)?
 
-*There are notable exceptions to this temporal trend:*
+[There are notable exceptions to this temporal trend:]{style="color:#0066FF;"}
 
-*9 Early sequences (all collected at 323 days post-seroconversion) appear deeper in the tree than expected for their collection time, showing greater evolutionary distance*
+[9 Early sequences (all collected at 323 days post-seroconversion) appear deeper in the tree than expected for their collection time, showing greater evolutionary distance]{style="color:#0066FF;"}
 
-*4 Late sequences (collected at 1394-1632 days post-seroconversion) appear closer to the root than expected, showing less evolutionary distance*
+\[4 Late sequences (collected at 1394-1632 days post-seroconversion) appear closer to the root than expected, showing less evolutionary distance\]{style="color:#0066FF;"}
 
-1.  What can we conclude about these exceptions?
+-   What can we conclude about these exceptions?
 
-*These exceptions suggest several biological phenomena in HIV evolution:*
+[These exceptions suggest several biological phenomena in HIV evolution:]{style="color:#0066FF;"}
 
-1.  ***Diverse viral population persistence:** The shallower Late sequences may represent viral lineages that remained relatively unchanged over time, possibly hiding in anatomical reservoirs with lower immune pressure or replication rates.*
+[1. **Diverse viral population persistence:** The shallower Late sequences may represent viral lineages that remained relatively unchanged over time, possibly hiding in anatomical reservoirs with lower immune pressure or replication rates.]{style="color:#0066FF;"}
 
-2.  ***Heterogeneous evolutionary rates:** Different viral lineages within the same patient evolved at different rates, possibly due to varying selection pressures in different anatomical compartments.*
+[2. **Heterogeneous evolutionary rates:** Different viral lineages within the same patient evolved at different rates, possibly due to varying selection pressures in different anatomical compartments.]{style="color:#0066FF;"}
 
-3.  ***Recombination:** HIV is known for recombination events, which could explain some sequences appearing in unexpected positions.*
+[3. **Recombination:** HIV is known for recombination events, which could explain some sequences appearing in unexpected positions.]{style="color:#0066FF;"}
 
-4.  ***Sampling from reservoirs:** Later sampling may have captured viruses from reservoir tissues where evolution proceeds more slowly due to reduced replication.*
+[4. **Sampling from reservoirs:** Later sampling may have captured viruses from reservoir tissues where evolution proceeds more slowly due to reduced replication.]{style="color:#0066FF;"}
 
-*The lack of monophyly for any time category further supports that HIV evolution within this patient proceeded along multiple concurrent lineages rather than in a strictly sequential manner, revealing the complex dynamics of within-host viral evolution.*
+[The lack of monophyly for any time category further supports that HIV evolution within this patient proceeded along multiple concurrent lineages rather than in a strictly sequential manner, revealing the complex dynamics of within-host viral evolution.]{style="color:#0066FF;"}
 
 The data file "sequences2.fasta" contains sequences extracted from HIV genomes that were collected from another single patient, who was also followed in time. Again, the first sequence is an exception: it is not from the same patient - it is a reference sequence that was collected much earlier (the same as before). The file "annot2.csv" contains annotations for these sequences.
 
@@ -331,7 +330,7 @@ ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
 # Use a moderate stretching factor
 for (i in 1:nrow(stretched_tree$edge)) {
   if (i != ref_edge_idx) {
-    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 6
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 10
   } else {
     # Slightly shorten the reference branch
     stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.8
@@ -368,7 +367,7 @@ library(grDevices)
 color_gradient <- colorRampPalette(c("#B300F2", "#DE0099", "#FF7E1D"))
 
 # Generate colors based on days
-tip_colors <- rep("darkblue", length(tip_days))  # Default for reference
+tip_colors <- rep("#0066FF", length(tip_days))  # Default for reference
 
 # Only proceed if we have valid days
 if (sum(!is.na(tip_days)) > 0) {
@@ -423,7 +422,7 @@ tiplabels(
   adj = c(-0.2, 0.5),  # Position the text to the right of the tip
   frame = "none",
   cex = 0.9,
-  col = "darkblue",
+  col = "#0066FF",
   font = 2  # Bold text
 )
 
@@ -475,7 +474,7 @@ for (i in 1:num_segments) {
 vertical_spacing <- legend_height / 5
 
 # Define key day values to show with better spacing
-key_days <- c(199, 59, 31, 0)
+key_days <- c(199, 115, 59, 0)
 ref_y_positions <- c(
   gradient_y_top,                        # 1632 (top)
   gradient_y_top - vertical_spacing,     # 1394
@@ -563,33 +562,33 @@ if(length(late_seq_indices) > 0) {
 
 -   How many sequences collected more than 100 days after seroconversion appear on the tree?
 
-    *Only 2 sequences were collected more than 100 days after seroconversion (at days 199 and 115).*
+    [Only 2 sequences were collected more than 100 days after seroconversion (at days 199 and 115).]{style="color:#0066FF;"}
 
 -   Where are they positioned on the tree?
 
-    *The late sequences are actually slightly closer to the root (average evolutionary distance 0.02414197) compared to early sequences (average distance 0.02507641).*
+    [The late sequences are actually slightly closer to the root (average evolutionary distance 0.02414197) compared to early sequences (average distance 0.02507641).]{style="color:#0066FF;"}
 
-    *They don't form a monophyletic group, indicating they evolved independently.*
+    [They don't form a monophyletic group, indicating they evolved independently.]{style="color:#0066FF;"}
 
 -   Is this surprising in light of the previous analysis (questions 2-3)?
 
-    *Yes, this is very surprising. In the first patient, we observed a clear pattern where sequences collected at later time points (323-1632 days) generally had greater evolutionary distances from the root, showing ongoing divergence over time.*
+    [Yes, this is very surprising. In the first patient, we observed a clear pattern where sequences collected at later time points (323-1632 days) generally had greater evolutionary distances from the root, showing ongoing divergence over time.]{style="color:#0066FF;"}
 
-    *In this second patient, we see the opposite pattern - the few late sequences are slightly closer to the root than early sequences, contrary to the expected evolutionary trajectory.*
+    [In this second patient, we see the opposite pattern - the few late sequences are slightly closer to the root than early sequences, contrary to the expected evolutionary trajectory.]{style="color:#0066FF;"}
 
 -   Propose a hypothesis regarding the difference between these two patients.
 
-    *The second patient dataset covers a much shorter timespan (0-199 days vs. 323-1632 days), which may be insufficient to observe directional evolution.*
+    [The second patient dataset covers a much shorter timespan (0-199 days vs. 323-1632 days), which may be insufficient to observe directional evolution.]{style="color:#0066FF;"}
 
-    *The second patient may have begun antiretroviral therapy, which can drastically alter viral evolution by suppressing replication.*
+    [The second patient may have begun antiretroviral therapy, which can drastically alter viral evolution by suppressing replication.]{style="color:#0066FF;"}
 
-    *The late sequences might represent viral variants reactivated from latent reservoirs containing earlier viral lineages.*
+    [The late sequences might represent viral variants reactivated from latent reservoirs containing earlier viral lineages.]{style="color:#0066FF;"}
 
-    *The second patient might have a different immune response profile, creating different selection pressures on the virus.*
+    [The second patient might have a different immune response profile, creating different selection pressures on the virus.]{style="color:#0066FF;"}
 
-    *The sampling might have been from different anatomical compartments where viral evolution proceeds at different rates.*
+    [The sampling might have been from different anatomical compartments where viral evolution proceeds at different rates.]{style="color:#0066FF;"}
 
-    *The second patient might represent a case of HIV superinfection or initial infection with multiple founder viruses with different evolutionary trajectories.*
+    [The second patient might represent a case of HIV superinfection or initial infection with multiple founder viruses with different evolutionary trajectories.]{style="color:#0066FF;"}
 
 6.  In this question, we will focus on sequences that were collected at seroconversion.
 
@@ -657,9 +656,50 @@ if (length(day0_seq_indices) >= 2) {
 7.  For the flu virus, the mean Jukes-Cantor distance between all sequences collected across the world in a given year is 0.008 and the maximum Jukes-Cantor distance between sequences in a given year is 0.04.
 
 -   Compare these values to those observed in question 6, in orders of magnitude.
+
 -   What does this tell us about HIV evolution?
 
 *Note for question 7:* for HIV, seroconversion takes about one month after infection, and the vast majority of HIV-1 infections are initiated by a single, genetically homogeneous founder virus variant.
+
+```{r}
+# Given flu virus values
+flu_mean_distance <- 0.008
+flu_max_distance <- 0.04
+
+# Our HIV values at seroconversion (day 0)
+hiv_mean_distance <- 0.004534841
+hiv_max_distance <- 0.01065449
+
+# Calculate ratios for comparison
+mean_ratio <- flu_mean_distance / hiv_mean_distance
+max_ratio <- flu_max_distance / hiv_max_distance
+
+cat("Comparison of genetic distances between HIV at seroconversion and flu in one year:\n")
+cat("Mean distances: HIV =", hiv_mean_distance, "vs Flu =", flu_mean_distance, "\n")
+cat("Ratio of means (Flu/HIV):", mean_ratio, "\n\n")
+cat("Maximum distances: HIV =", hiv_max_distance, "vs Flu =", flu_max_distance, "\n")
+cat("Ratio of maximums (Flu/HIV):", max_ratio, "\n")
+```
+
+[\### HIV vs. Flu Evolution]{style="color:#0066FF;"}
+
+[The comparison between HIV at seroconversion and global flu samples over a year reveals striking differences in viral evolution:]{style="color:#0066FF;"}
+
+[- **Mean genetic distance comparison**: HIV at seroconversion (0.0045) vs. Flu over a year (0.008) The flu mean is about 1.8 times larger than HIV]{style="color:#0066FF;"}
+
+[- **Maximum genetic distance comparison**: HIV at seroconversion (0.0107) vs. Flu over a year (0.04) The flu maximum is about 3.7 times larger than HIV]{style="color:#0066FF;"}
+
+[This tells us several important things about HIV evolution:]{style="color:#0066FF;"}
+
+[1. **Remarkably rapid diversification**: Despite starting from a single founder virus just one month before seroconversion, HIV already shows substantial genetic diversity - more than half the mean diversity seen in global flu samples over an entire year.]{style="color:#0066FF;"}
+
+[2. **Extreme mutation rate**: HIV's reverse transcriptase lacks proofreading capability, resulting in an extraordinarily high mutation rate that leads to this rapid within-host diversification early in infection.]{style="color:#0066FF;"}
+
+[3. **Early quasispecies formation**: The bimodal distribution in the histogram suggests that HIV forms distinct viral populations (quasispecies) very early in infection, with many sequences showing very small distances (likely recent descendants from the founder virus) and another peak at greater distances (early adaptations).]{style="color:#0066FF;"}
+
+[4. **Different evolutionary pressures**: While flu evolves under selection pressure to escape population-level immunity across multiple hosts, HIV diversifies rapidly within a single host, reflecting its strategy of generating high variability to escape the developing immune response.]{style="color:#0066FF;"}
+
+[The substantial diversity observed at seroconversion underscores HIV's exceptional capacity for evolutionary adaptation, explaining its ability to persist despite immune responses and develop resistance to antiretroviral drugs.]{style="color:#0066FF;"}
 
 ## Exercise 2 - Simulating experimental evolution with serial passage and mutations
 
@@ -667,29 +707,29 @@ if (length(day0_seq_indices) >= 2) {
 
 1.  *In this first question, we neglect all mutations, and thus we assume that there are only wild-type individuals in the population. In the LTEE, serial transfer is performed everyday. Population size is multiplied by 100 at the end of the day, compared to the initial bottleneck at the beginning of the day. Recall that we assume for simplicity that growth is exponential. What is the value of* $t$ *that matches the LTEE?*
 
-*We need to determine the value of time* $t$ *that matches the LTEE conditions, where the population size is multiplied by 100 during each growth phase.*
+[We need to determine the value of time $t$ that matches the LTEE conditions, where the population size is multiplied by 100 during each growth phase.]{style="color:#0066FF;"}
 
-*In the LTEE, the population undergoes exponential growth where: - Initial size:* $K$ *(bottleneck) - Final size before transfer:* $100K$ *- Growth rate for wild-type:* $r = 1$
+[In the LTEE, the population undergoes exponential growth where: - Initial size: $K$ (bottleneck) - Final size before transfer: $100K$ - Growth rate for wild-type: $r = 1$]{style="color:#0066FF;"}
 
-*For exponential growth, the population size follows:*
+[For exponential growth, the population size follows:]{style="color:#0066FF;"}
 
-$$N(t) = N(0) \times e^{rt}$$
+[$$N(t) = N(0) \times e^{rt}$$]{style="color:#0066FF;"}
 
-*Where* $N(0) = K$ *and* $N(t) = 100K$
+[Where $N(0) = K$ and $N(t) = 100K$]{style="color:#0066FF;"}
 
-*Therefore:*
+[Therefore:]{style="color:#0066FF;"}
 
-$$100K = K \times e^{1 \times t}$$
+[$$100K = K \times e^{1 \times t}$$]{style="color:#0066FF;"}
 
-*Dividing both sides by* $K$*:*
+[Dividing both sides by $K$:]{style="color:#0066FF;"}
 
-$$100 = e^t$$
+[$$100 = e^t$$]{style="color:#0066FF;"}
 
-*Taking the natural logarithm:*
+[Taking the natural logarithm:]{style="color:#0066FF;"}
 
-$$\ln(100) = t$$
+[$$\ln(100) = t$$]{style="color:#0066FF;"}
 
-*Let's calculate this value:*
+[Calculating this value:]{style="color:#0066FF;"}
 
 ```{r}
 # Calculate the time t needed for 100-fold growth 
@@ -704,35 +744,35 @@ print(paste("Time t =", round(t, 4), "generations"))
 -   Same question if all values are the same except that $s=0.5$.
 -   Compare the results obtained in these two cases, and comment.
 
-### *a) Mathematical derivation of mutant fraction after growth*
+[\### a) Mathematical derivation of mutant fraction after growth]{style="color:#0066FF;"}
 
-*We derive the formula for the mutant fraction after growth.*
+[We derive the formula for the mutant fraction after growth.]{style="color:#0066FF;"}
 
-*We denote: - Initial wild-type population:* $N_w(0) = (1-x)K$ *- Initial mutant population:* $N_m(0) = xK$
+[We denote: - Initial wild-type population: $N_w(0) = (1-x)K$ - Initial mutant population: $N_m(0) = xK$]{style="color:#0066FF;"}
 
-*During exponential growth with time* $t$*: - Wild-type after time* $t$*:* $N_w(t) = (1-x)K \times e^t$ *- Mutants after time* $t$*:* $N_m(t) = xK \times e^{(1+s)t}$
+[During exponential growth with time $t$: - Wild-type after time $t$: $N_w(t) = (1-x)K \times e^t$ - Mutants after time $t$: $N_m(t) = xK \times e^{(1+s)t}$]{style="color:#0066FF;"}
 
-*The new mutant fraction* $x'$ *is:*
+[The new mutant fraction $x'$ is:]{style="color:#0066FF;"}
 
-$$x' = \frac{N_m(t)}{N_w(t) + N_m(t)}$$
+[$$x' = \frac{N_m(t)}{N_w(t) + N_m(t)}$$]{style="color:#0066FF;"}
 
-*Substituting the expressions:*
+[Substituting the expressions:]{style="color:#0066FF;"}
 
-$$x' = \frac{xK \times e^{(1+s)t}}{(1-x)K \times e^t + xK \times e^{(1+s)t}}$$
+[$$x' = \frac{xK \times e^{(1+s)t}}{(1-x)K \times e^t + xK \times e^{(1+s)t}}$$]{style="color:#0066FF;"}
 
-*Simplifying:*
+[Simplifying:]{style="color:#0066FF;"}
 
-$$x' = \frac{x \times e^{(1+s)t}}{(1-x) \times e^t + x \times e^{(1+s)t}}$$
+[$$x' = \frac{x \times e^{(1+s)t}}{(1-x) \times e^t + x \times e^{(1+s)t}}$$]{style="color:#0066FF;"}
 
-$$x' = \frac{x \times e^{st} \times e^t}{(1-x) \times e^t + x \times e^{st} \times e^t}$$
+[$$x' = \frac{x \times e^{st} \times e^t}{(1-x) \times e^t + x \times e^{st} \times e^t}$$]{style="color:#0066FF;"}
 
-*Factoring out* $e^t$*:*
+[Factoring out $e^t$:]{style="color:#0066FF;"}
 
-$$x' = \frac{x \times e^{st}}{(1-x) + x \times e^{st}}$$
+[$$x' = \frac{x \times e^{st}}{(1-x) + x \times e^{st}}$$]{style="color:#0066FF;"}
 
-*This is our final formula for the mutant fraction after growth.*
+[This is our final formula for the mutant fraction after growth.]{style="color:#0066FF;"}
 
-### *b) Calculation for specific parameter values*
+[\### b) Calculation for specific parameter values]{style="color:#0066FF;"}
 
 ```{r}
 # Function to calculate mutant fraction after growth
@@ -755,30 +795,25 @@ cat("Fold increase for s=0.01:", case1/0.01, "\n")
 cat("Fold increase for s=0.5:", case2/0.01, "\n")
 ```
 
-### *c) Comparison and commentary*
+[\### c) Comparison and commentary]{style="color:#0066FF;"}
 
-*The results demonstrate the significant impact of selection coefficient (*$s$*) on the evolutionary dynamics:*
+[The results demonstrate the significant impact of selection coefficient ($s$) on the evolutionary dynamics:]{style="color:#0066FF;"}
 
-1.  ***With weak selection (***$s=0.01$*):*
-    -   *The mutant fraction increases from 0.01 to 0.01050732, which is precisely a 5.0732% increase*
-    -   *The fold increase is exactly 1.050732*
-    -   *This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition*
-2.  ***With strong selection (***$s=0.5$*):*
-    -   *The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase*
-    -   *In percentage terms, this represents a dramatic 995.721% increase*
-    -   *Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency*
-3.  ***Implications for experimental evolution**:*
-    -   *The selection coefficient is a critical parameter determining the rate of adaptation*
-    -   *In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population*
-    -   *For mutations with small fitness advantages (like* $s=0.01$*), genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation*
-    -   *Mutations with large fitness advantages (like* $s=0.5$*) would be expected to dominate even after a few cycles*
-4.  ***Mathematical explanation**:*
-    -   *The exponential term* $e^{st}$ *amplifies even small differences in* $s$ *over time*
-    -   *For* $s=0.01$ *and* $t=5$*, we get* $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$
-    -   *For* $s=0.5$ *and* $t=5$*, we get* $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$
-    -   *This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change*
+[1. **With weak selection (**$s=0.01$): - The mutant fraction increases from 0.01 to 0.01050732, which is precisely a 5.0732% increase - The fold increase is exactly 1.050732 - This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition]{style="color:#0066FF;"}
 
-*This calculation illustrates why beneficial mutations with larger selection coefficients are typically observed first in evolution experiments, while those with smaller effects may take much longer to detect.*
+[2. **With strong selection (**$s=0.5$):]{style="color:#0066FF;"}
+
+[- The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase]{style="color:#0066FF;"} [- In percentage terms, this represents a dramatic 995.721% increase]{style="color:#0066FF;"} [- Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency]{style="color:#0066FF;"}
+
+[3. **Implications for experimental evolution**:]{style="color:#0066FF;"}
+
+[- The selection coefficient is a critical parameter determining the rate of adaptation]{style="color:#0066FF;"} [- In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population]{style="color:#0066FF;"} [- For mutations with small fitness advantages (like $s=0.01$), genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation]{style="color:#0066FF;"} [- Mutations with large fitness advantages (like $s=0.5$) would be expected to dominate even after a few cycles]{style="color:#0066FF;"}
+
+[4. **Mathematical explanation**:]{style="color:#0066FF;"}
+
+[- The exponential term $e^{st}$ amplifies even small differences in $s$ over time]{style="color:#0066FF;"} [- For $s=0.01$ and $t=5$, we get $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$]{style="color:#0066FF;"} [- For $s=0.5$ and $t=5$, we get $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$]{style="color:#0066FF;"} \[- This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change\]{style="color:#0066FF;"}
+
+[This calculation illustrates why beneficial mutations with larger selection coefficients are typically observed first in evolution experiments, while those with smaller effects may take much longer to detect.]{style="color:#0066FF;"}
 
 3.  To take into account the new mutations that may happen during the growth phase, we will use the function *rflan* from the R package *flan* that allows to sample the number of mutants that descend from a given wild-type cell after a certain number of generations. Specifically, *sampled_data=rflan(N, mutations = nmu, fitness = 1/(1+s), mfn = n_grow)* provides N realizations of the number of mutants that arise from growth starting from one cell and reaching n_grow cells, where nmu mutation events happen on average and mutants have fitness 1+s. The numbers of mutants sampled are stored in *sampled_data\$mc*.
 
@@ -816,15 +851,15 @@ cat("Variance of mutants:", var_mutants, "\n")
 cat("Variance-to-mean ratio:", var_mutants/mean_mutants, "\n")
 ```
 
-*The variance (658.1651) is dramatically larger than the mean (5.584), with a variance-to-mean ratio of approximately 117.87. This represents extreme overdispersion, as a Poisson distribution would have a variance-to-mean ratio of 1*
+[The variance (658.1651) is dramatically larger than the mean (5.584), with a variance-to-mean ratio of approximately 117.87. This represents extreme overdispersion, as a Poisson distribution would have a variance-to-mean ratio of 1]{style="color:#0066FF;"}
 
-*This extreme overdispersion is caused by two key factors:*
+[This extreme overdispersion is caused by two key factors:]{style="color:#0066FF;"}
 
-***The timing of mutations:** Mutations that occur early during the growth phase generate many more descendants than late mutations due to the exponential growth process*
+[**The timing of mutations:** Mutations that occur early during the growth phase generate many more descendants than late mutations due to the exponential growth process]{style="color:#0066FF;"}
 
-***The selection advantage (s=0.01):** Mutant lineages grow faster than wild-type cells, which amplifies the effect of early mutations*
+[**The selection advantage (s=0.01):** Mutant lineages grow faster than wild-type cells, which amplifies the effect of early mutations]{style="color:#0066FF;"}
 
-*These factors create a highly skewed distribution with many samples having few mutants, while a small number of samples have very large numbers of mutants. This results in the observed high variance without substantially affecting the mean*
+[These factors create a highly skewed distribution with many samples having few mutants, while a small number of samples have very large numbers of mutants. This results in the observed high variance without substantially affecting the mean]{style="color:#0066FF;"}
 
 4.  In this question, we will consider a population that starts with $K=5\times 10^6$ wild-type individuals (to match the LTEE). The population undergoes exponential growth for one day as explained in question 1. We assume that all mutants have $s=0.01$, and that one mutation event happens on average during the whole growth phase (nmu=1).
 
@@ -897,48 +932,48 @@ cat("Coefficient of variation:", cv_fraction, "\n")
 
 ```
 
-*The results show extreme variability in mutant counts across the 10 replicates:*
+[The results show extreme variability in mutant counts across the 10 replicates:]{style="color:#0066FF;"}
 
-*4 replicates produced zero mutants 5 replicates had low mutant counts (1-7) 1 replicate (replicate 2) had 70 mutants, which is dramatically higher than all others*
+[4 replicates produced zero mutants 5 replicates had low mutant counts (1-7) 1 replicate (replicate 2) had 70 mutants, which is dramatically higher than all others]{style="color:#0066FF;"}
 
-*This pattern creates striking statistical properties:*
+[This pattern creates striking statistical properties:\*]{style="color:#0066FF;"}
 
-*Mean mutant count: 9 Standard deviation: 21.61 Coefficient of variation: 2.40 (SD/mean)*
+[Mean mutant count: 9 Standard deviation: 21.61 Coefficient of variation: 2.40 (SD/mean)]{style="color:#0066FF;"}
 
-*The standard deviation is more than twice the mean value, indicating extreme overdispersion. This directly connects to our findings in Question 3, where we observed a variance-to-mean ratio of approximately 118 for mutants arising from single cells. This variability can be explained by two key stochastic factors:*
+[The standard deviation is more than twice the mean value, indicating extreme overdispersion. This directly connects to our findings in Question 3, where we observed a variance-to-mean ratio of approximately 118 for mutants arising from single cells. This variability can be explained by two key stochastic factors:]{style="color:#0066FF;"}
 
-*Mutation timing: When a mutation occurs during the growth phase dramatically affects the final number of mutants. Early mutations produce exponentially more descendants than late mutations. Poisson variability in mutation events: Since mutations are rare events (average of 1 per growth phase across the whole population), some replicates have no mutations while others might have multiple.*
+[Mutation timing: When a mutation occurs during the growth phase dramatically affects the final number of mutants. Early mutations produce exponentially more descendants than late mutations. Poisson variability in mutation events: Since mutations are rare events (average of 1 per growth phase across the whole population), some replicates have no mutations while others might have multiple.]{style="color:#0066FF;"}
 
-*The outlier in replicate 2 (70 mutants) likely represents a case where either:*
+[The outlier in replicate 2 (70 mutants) likely represents a case where either:]{style="color:#0066FF;"}
 
-*Multiple mutation events occurred by chance, or A mutation occurred very early in the growth phase, allowing the mutant lineage to exploit its selective advantage (s=0.01) over more generations*
+[Multiple mutation events occurred by chance, or A mutation occurred very early in the growth phase, allowing the mutant lineage to exploit its selective advantage (s=0.01) over more generations]{style="color:#0066FF;"}
 
-*This extreme variability has important implications for experimental evolution:*
+[This extreme variability has important implications for experimental evolution:]{style="color:#0066FF;"}
 
-*Replicate populations can follow dramatically different evolutionary trajectories Beneficial mutations may establish in some replicates but not others, purely by chance Population bottlenecks amplify this variability by randomly sampling from these highly variable distributions*
+[Replicate populations can follow dramatically different evolutionary trajectories Beneficial mutations may establish in some replicates but not others, purely by chance Population bottlenecks amplify this variability by randomly sampling from these highly variable distributions]{style="color:#0066FF;"}
 
-*The results illustrate why large numbers of replicates are crucial in experimental evolution studies to account for the inherent stochasticity in mutation occurrence and establishment.*
+[The results illustrate why large numbers of replicates are crucial in experimental evolution studies to account for the inherent stochasticity in mutation occurrence and establishment.]{style="color:#0066FF;"}
 
 5.  In this question, we will consider a given dilution step, and we will call $k$ the number of mutants that are sampled to form the next bottleneck, which should comprise $K$ individuals.
 
 -   What is the name of the probability distribution that $k$ follows?
 -   Write the formula for the probability $P(k)$ to obtain a given value of $k$. Note: here, if possible, we recommend using LaTeX for presentation quality.
 
-### *a) Probability distribution for the number of mutants sampled*
+[\### a) Probability distribution for the number of mutants sampled]{style="color:#0066FF;"}
 
-*The number of mutants* $k$ *sampled to form the next bottleneck follows a **binomial distribution**.*
+[The number of mutants\* $k$ sampled to form the next bottleneck follows a **binomial distribution**.]{style="color:#0066FF;"}
 
-*This is because: - We're sampling* $K$ *individuals from a large population - Each individual sampled is either a mutant (with probability* $x'$*) or wild-type (with probability* $1-x'$*) - Each sampling event is independent - We're interested in the number of "successes" (mutants) in* $K$ *trials*
+[This is because:]{style="color:#0066FF;"} [- We're sampling\* $K$ \*individuals from a large population]{style="color:#0066FF;"} [- Each individual sampled is either a mutant (with probability $x'$) or wild-type (with probability $1-x'$)]{style="color:#0066FF;"} [- Each sampling event is independent - We're interested in the number of "successes" (mutants) in $K$ trials]{style="color:#0066FF;"}
 
-### *b) Formula for the probability* $P(k)$
+[\### b) Formula for the probability $P(k)$]{style="color:#0066FF;"}
 
-*The probability of sampling exactly* $k$ *mutants when forming a bottleneck of size* $K$ *is given by:*
+[The probability of sampling exactly\* $k$ *mutants when forming a bottleneck of size* $K$ \*is given by:]{style="color:#0066FF;"}
 
-$$P(k) = \binom{K}{k} (x')^k (1-x')^{K-k}$$
+[$$P(k) = \binom{K}{k} (x')^k (1-x')^{K-k}$$]{style="color:#0066FF;"}
 
-*Where: -* $k$ *is the number of mutants sampled (*$0 \leq k \leq K$*) -* $K$ *is the bottleneck size -* $x'$ *is the mutant fraction after growth -* $\binom{K}{k} = \frac{K!}{k!(K-k)!}$ *is the binomial coefficient*
+[Where:]{style="color:#0066FF;"} [- $k$ is the number of mutants sampled ($0 \leq k \leq K$)]{style="color:#0066FF;"} [- $K$ is the bottleneck size]{style="color:#0066FF;"} [- $x'$ is the mutant fraction after growth]{style="color:#0066FF;"} [- $\binom{K}{k} = \frac{K!}{k!(K-k)!}$ is the binomial coefficient]{style="color:#0066FF;"}
 
-*This formula represents the probability mass function of the binomial distribution* $B(K, x')$*.*
+[This formula represents the probability mass function of the binomial distribution $B(K, x')$.]{style="color:#0066FF;"}
 
 6.  In this question, we will sample the number $k$ of mutants that exist at the next bottleneck, assuming that $s=0.01$, $K=5\times 10^6$ and $x=0.01$, and taking $t=5$.
 
@@ -980,7 +1015,7 @@ hist(k_samples,
 abline(v = mean_k, col = "#FF7E1D", lwd = 2)
 ```
 
-*The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters* $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.
+[The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.]{style="color:#0066FF;"}
 
 7.  In this question, we will simulate the serial passage model. We will neglect new mutations that may happen during the process. Thus, the only mutants are those present initially, and we will assume that they have an initial fraction $x=0.01$.
 
@@ -1010,7 +1045,7 @@ x_values <- matrix(0, nrow = n_bottlenecks + 1, ncol = n_realizations)
 x_values[1, ] <- x_init
 
 # Run simulations
-set.seed(123)  # For reproducibility
+set.seed(42)  # For reproducibility
 for (j in 1:n_realizations) {
   x <- x_init
   for (i in 1:n_bottlenecks) {
@@ -1050,7 +1085,7 @@ colors <- rainbow(n_realizations)
 # Plot the results
 plot(0:n_bottlenecks, x_values[, 1], type = "l", col = colors[1],
      xlab = "Number of bottlenecks", ylab = "Mutant fraction",
-     ylim = c(0, 1), main = "Serial passage model with selection (s=0.01)",
+     ylim = c(0, 1), main = "Serial passage model with selection (s=0.01) & bottleneck (K=5e6)",
      lwd = 2)
 
 # Add other realizations
@@ -1063,14 +1098,88 @@ legend("topleft", legend = paste("Realization", 1:n_realizations),
        col = colors, lty = 1, cex = 0.8, bg = "white")
 ```
 
-*Analysis of Serial Passage Results*
+[Analysis of Serial Passage Results]{style="color:#0066FF;"}
 
-*The simulation results show remarkably consistent trajectories with all 10 realizations reaching near-complete fixation (\>0.999) by the end of 300 bottlenecks. This reveals:*
+[The simulation results show remarkably consistent trajectories with all 10 realizations reaching near-complete fixation (\>0.999) by the end of 300 bottlenecks. This reveals:]{style="color:#0066FF;"}
 
-*Deterministic dynamics dominate: The trajectories follow an almost perfect sigmoidal curve with minimal random variation. Selection overwhelmingly outweighs drift: With Ns = 50,000 (K×s = 5×10\^6 × 0.01), selection is approximately 50,000 times stronger than genetic drift, explaining why stochastic effects are nearly invisible. Minimal sampling variance: For a binomial process with such large populations, the standard deviation is negligibly small relative to the population size (\~0.022% at maximum variance).*
+[Deterministic dynamics dominate: The trajectories follow an almost perfect sigmoidal curve with minimal random variation. Selection overwhelmingly outweighs drift: With Ns = 50,000 (K×s = 5×10\^6 × 0.01), selection is approximately 50,000 times stronger than genetic drift, explaining why stochastic effects are nearly invisible. Minimal sampling variance: For a binomial process with such large populations, the standard deviation is negligibly small relative to the population size (\~0.022% at maximum variance).]{style="color:#0066FF;"}
 
-*Implications This simulation demonstrates a practically deterministic regime of evolution where:*
+[Implications This simulation demonstrates a practically deterministic regime of evolution where:]{style="color:#0066FF;"}
 
-*Predictable outcomes: Large population sizes with moderate selection coefficients produce highly predictable evolutionary trajectories. Limited role for chance: Unlike in smaller populations where drift can lead to loss of beneficial mutations, here selection reliably drives beneficial mutations to fixation.*
+[Predictable outcomes: Large population sizes with moderate selection coefficients produce highly predictable evolutionary trajectories. Limited role for chance: Unlike in smaller populations where drift can lead to loss of beneficial mutations, here selection reliably drives beneficial mutations to fixation.]{style="color:#0066FF;"}
 
-*To observe more stochastic effects and trajectory diversity, we would need a much smaller bottleneck size (e.g., K = 1,000) or a weaker selection coefficient (e.g., s = 0.0001).*
+[To observe more stochastic effects and trajectory diversity, we would need a much smaller bottleneck size (e.g., K = 5,000) or a weaker selection coefficient (e.g., s = 0.0001).]{style="color:#0066FF;"}
+
+```{r}
+# Parameters
+s <- 0.01       # Selection coefficient
+K <- 5e3        # Small bottleneck size
+x_init <- 0.01  # Initial mutant fraction
+t <- 5          # Growth time
+n_bottlenecks <- 300  # Number of bottlenecks to simulate
+n_realizations <- 10  # Number of different realizations
+
+# Function to calculate mutant fraction after growth
+calculate_x_prime <- function(x, s, t) {
+  return((x * exp(s * t)) / ((1 - x) + x * exp(s * t)))
+}
+
+# Set up matrix to store results - rows are bottlenecks, columns are realizations
+x_values <- matrix(0, nrow = n_bottlenecks + 1, ncol = n_realizations)
+
+# Initialize all realizations with the same starting value
+x_values[1, ] <- x_init
+
+# Run simulations
+set.seed(42)  # For reproducibility
+for (j in 1:n_realizations) {
+  x <- x_init
+  for (i in 1:n_bottlenecks) {
+    # Calculate mutant fraction after growth
+    x_prime <- calculate_x_prime(x, s, t)
+    
+    # Sample for the next bottleneck
+    k <- rbinom(1, K, x_prime)
+    
+    # Calculate new mutant fraction
+    x <- k / K
+    
+    # Store the result
+    x_values[i + 1, j] <- x
+  }
+}
+
+# Calculate final mutant frequencies
+final_frequencies <- x_values[n_bottlenecks + 1, ]
+cat("Final mutant frequencies:", final_frequencies, "\n")
+cat("Mean final frequency:", mean(final_frequencies), "\n")
+
+# Calculate how many realizations reach different thresholds
+fixation_count <- sum(final_frequencies > 0.99)
+high_freq_count <- sum(final_frequencies > 0.5 & final_frequencies <= 0.99)
+low_freq_count <- sum(final_frequencies > 0.01 & final_frequencies <= 0.5)
+extinction_count <- sum(final_frequencies <= 0.01)
+
+cat("Realizations reaching fixation (>0.99):", fixation_count, "\n")
+cat("Realizations reaching high frequency (0.5-0.99):", high_freq_count, "\n")
+cat("Realizations maintaining low frequency (0.01-0.5):", low_freq_count, "\n")
+cat("Realizations with extinction or near-extinction (<0.01):", extinction_count, "\n")
+
+# Create a color palette
+colors <- rainbow(n_realizations)
+
+# Plot the results
+plot(0:n_bottlenecks, x_values[, 1], type = "l", col = colors[1],
+     xlab = "Number of bottlenecks", ylab = "Mutant fraction",
+     ylim = c(0, 1), main = "Serial passage model with selection (s=0.01) & bottleneck (K=5e3)",
+     lwd = 2)
+
+# Add other realizations
+for (j in 2:n_realizations) {
+  lines(0:n_bottlenecks, x_values[, j], col = colors[j], lwd = 2)
+}
+
+# Add legend
+legend("topleft", legend = paste("Realization", 1:n_realizations),
+       col = colors, lty = 1, cex = 0.8, bg = "white")
+```
