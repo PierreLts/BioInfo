@@ -787,6 +787,45 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 -   How does the variance compare to the mean?
 -   What causes this?
 
+```{r}
+# Install and load the flan package if not already installed
+if (!requireNamespace("flan", quietly = TRUE)) {
+  install.packages("flan")
+}
+library(flan)
+
+# Sample 1000 times the final number of mutants
+set.seed(123) # For reproducibility
+N <- 1000
+nmu <- 1
+s <- 0.01
+n_grow <- 100
+
+sampled_data <- rflan(N, mutations = nmu, fitness = 1/(1+s), mfn = n_grow)
+
+# Extract the mutant counts
+mutant_counts <- sampled_data$mc
+
+# Calculate mean and variance
+mean_mutants <- mean(mutant_counts)
+var_mutants <- var(mutant_counts)
+
+# Print results
+cat("Mean number of mutants:", mean_mutants, "\n")
+cat("Variance of mutants:", var_mutants, "\n")
+cat("Variance-to-mean ratio:", var_mutants/mean_mutants, "\n")
+```
+
+*The variance (658.1651) is dramatically larger than the mean (5.584), with a variance-to-mean ratio of approximately 117.87. This represents extreme overdispersion, as a Poisson distribution would have a variance-to-mean ratio of 1*
+
+*This extreme overdispersion is caused by two key factors:*
+
+***The timing of mutations:** Mutations that occur early during the growth phase generate many more descendants than late mutations due to the exponential growth process*
+
+***The selection advantage (s=0.01):** Mutant lineages grow faster than wild-type cells, which amplifies the effect of early mutations*
+
+*These factors create a highly skewed distribution with many samples having few mutants, while a small number of samples have very large numbers of mutants. This results in the observed high variance without substantially affecting the mean*
+
 4.  In this question, we will consider a population that starts with $K=5\times 10^6$ wild-type individuals (to match the LTEE). The population undergoes exponential growth for one day as explained in question 1. We assume that all mutants have $s=0.01$, and that one mutation event happens on average during the whole growth phase (nmu=1).
 
 -   Simulate 10 replicates of the outcome of this growth phase (with the same initial conditions), using *rflan*. Note: this takes a bit of computational time.
