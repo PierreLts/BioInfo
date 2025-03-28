@@ -946,6 +946,42 @@ $$P(k) = \binom{K}{k} (x')^k (1-x')^{K-k}$$
 -   Compute their mean and standard deviation.
 -   Plot the histogram of the values obtained.
 
+```{r}
+# Parameters
+s <- 0.01       # Selection coefficient
+K <- 5e6        # Bottleneck size
+x <- 0.01       # Initial mutant fraction
+t <- 5          # Growth time
+N <- 1000       # Number of samples
+
+# Calculate x' (mutant fraction after growth)
+x_prime <- (x * exp(s * t)) / ((1 - x) + x * exp(s * t))
+
+# Sample k from binomial distribution
+k_samples <- rbinom(N, size = K, prob = x_prime)
+
+# Calculate mean and standard deviation
+mean_k <- mean(k_samples)
+sd_k <- sd(k_samples)
+
+# Print results
+cat("Mutant fraction after growth (x'):", x_prime, "\n")
+cat("Mean number of mutants:", mean_k, "\n")
+cat("Standard deviation:", sd_k, "\n")
+
+# Plot histogram
+hist(k_samples, 
+     main = "Distribution of Mutants in Next Bottleneck",
+     xlab = "Number of mutants (k)",
+     col = "#DE0099",
+     breaks = 30)
+
+# Add mean line
+abline(v = mean_k, col = "#FF7E1D", lwd = 2)
+```
+
+*The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535.05 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.*
+
 7.  In this question, we will simulate the serial passage model. We will neglect new mutations that may happen during the process. Thus, the only mutants are those present initially, and we will assume that they have an initial fraction $x=0.01$.
 
 -   Simulate the serial passage model described above with $s=0.01$, $K=5\times 10^6$ and $x=0.01$, and taking $t=5$, for 300 bottlenecks.
