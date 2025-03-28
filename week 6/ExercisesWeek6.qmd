@@ -704,6 +704,77 @@ print(paste("Time t =", round(t, 4), "generations"))
 -   Same question if all values are the same except that $s=0.5$.
 -   Compare the results obtained in these two cases, and comment.
 
+### *a) Mathematical derivation of mutant fraction after growth*
+
+*We derive the formula for the mutant fraction after growth.*
+
+*We denote: - Initial wild-type population:* $N_w(0) = (1-x)K$ *- Initial mutant population:* $N_m(0) = xK$
+
+*During exponential growth with time* $t$*: - Wild-type after time* $t$*:* $N_w(t) = (1-x)K \times e^t$ *- Mutants after time* $t$*:* $N_m(t) = xK \times e^{(1+s)t}$
+
+*The new mutant fraction* $x'$ *is:*
+
+$$x' = \frac{N_m(t)}{N_w(t) + N_m(t)}$$
+
+*Substituting the expressions:*
+
+$$x' = \frac{xK \times e^{(1+s)t}}{(1-x)K \times e^t + xK \times e^{(1+s)t}}$$
+
+*Simplifying:*
+
+$$x' = \frac{x \times e^{(1+s)t}}{(1-x) \times e^t + x \times e^{(1+s)t}}$$
+
+$$x' = \frac{x \times e^{st} \times e^t}{(1-x) \times e^t + x \times e^{st} \times e^t}$$
+
+*Factoring out* $e^t$*:*
+
+$$x' = \frac{x \times e^{st}}{(1-x) + x \times e^{st}}$$
+
+*This is our final formula for the mutant fraction after growth.*
+
+### *b) Calculation for specific parameter values*
+
+```{r}
+# Function to calculate mutant fraction after growth
+calculate_mutant_fraction <- function(x, s, t) {
+  numerator <- x * exp(s * t)
+  denominator <- (1 - x) + x * exp(s * t)
+  return(numerator / denominator)
+}
+
+# Case 1: s = 0.01, x = 0.01, t = 5
+case1 <- calculate_mutant_fraction(0.01, 0.01, 5)
+cat("Case 1 (s=0.01): x' =", case1, "\n")
+
+# Case 2: s = 0.5, x = 0.01, t = 5
+case2 <- calculate_mutant_fraction(0.01, 0.5, 5)
+cat("Case 2 (s=0.5): x' =", case2, "\n")
+
+# Calculate the ratio of increase in each case
+cat("Fold increase for s=0.01:", case1/0.01, "\n")
+cat("Fold increase for s=0.5:", case2/0.01, "\n")
+```
+
+### *c) Comparison and commentary*
+
+*The results demonstrate the significant impact of selection coefficient (*$s$*) on the evolutionary dynamics:*
+
+1.  ***With weak selection (***$s=0.01$*):*
+    -   *The mutant fraction increases only slightly after growth (approximately 5% increase)*
+    -   *This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition*
+2.  ***With strong selection (***$s=0.5$*):*
+    -   *The mutant fraction increases dramatically (nearly 11-fold)*
+    -   *Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency*
+3.  ***Implications for experimental evolution**:*
+    -   *The selection coefficient is a critical parameter determining the rate of adaptation*
+    -   *In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population*
+    -   *For mutations with small fitness advantages, genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation*
+4.  ***Mathematical explanation**:*
+    -   *The exponential term* $e^{st}$ *amplifies even small differences in* $s$ *over time*
+    -   *This demonstrates why even small fitness advantages can eventually lead to fixation given enough time*
+
+*This calculation illustrates why beneficial mutations with larger selection coefficients are typically observed first in evolution experiments, while those with smaller effects may take much longer to detect.*
+
 3.  To take into account the new mutations that may happen during the growth phase, we will use the function *rflan* from the R package *flan* that allows to sample the number of mutants that descend from a given wild-type cell after a certain number of generations. Specifically, *sampled_data=rflan(N, mutations = nmu, fitness = 1/(1+s), mfn = n_grow)* provides N realizations of the number of mutants that arise from growth starting from one cell and reaching n_grow cells, where nmu mutation events happen on average and mutants have fitness 1+s. The numbers of mutants sampled are stored in *sampled_data\$mc*.
 
 -   Use *rflan* to sample N=1000 times the final number of mutants after growth with nmu=1, s=0.01 and n_grow=100.
