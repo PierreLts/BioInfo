@@ -760,18 +760,23 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 *The results demonstrate the significant impact of selection coefficient (*$s$*) on the evolutionary dynamics:*
 
 1.  ***With weak selection (***$s=0.01$*):*
-    -   *The mutant fraction increases only slightly after growth (approximately 5% increase)*
+    -   *The mutant fraction increases from 0.01 to 0.01050732, which is precisely a 5.0732% increase*
+    -   *The fold increase is exactly 1.050732*
     -   *This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition*
 2.  ***With strong selection (***$s=0.5$*):*
-    -   *The mutant fraction increases dramatically (nearly 11-fold)*
+    -   *The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase*
+    -   *In percentage terms, this represents a dramatic 995.721% increase*
     -   *Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency*
 3.  ***Implications for experimental evolution**:*
     -   *The selection coefficient is a critical parameter determining the rate of adaptation*
     -   *In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population*
-    -   *For mutations with small fitness advantages, genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation*
+    -   *For mutations with small fitness advantages (like* $s=0.01$*), genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation*
+    -   *Mutations with large fitness advantages (like* $s=0.5$*) would be expected to dominate even after a few cycles*
 4.  ***Mathematical explanation**:*
     -   *The exponential term* $e^{st}$ *amplifies even small differences in* $s$ *over time*
-    -   *This demonstrates why even small fitness advantages can eventually lead to fixation given enough time*
+    -   *For* $s=0.01$ *and* $t=5$*, we get* $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$
+    -   *For* $s=0.5$ *and* $t=5$*, we get* $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$
+    -   *This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change*
 
 *This calculation illustrates why beneficial mutations with larger selection coefficients are typically observed first in evolution experiments, while those with smaller effects may take much longer to detect.*
 
