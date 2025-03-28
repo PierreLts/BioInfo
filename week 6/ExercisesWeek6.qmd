@@ -832,6 +832,93 @@ cat("Variance-to-mean ratio:", var_mutants/mean_mutants, "\n")
 -   Calculate the final fraction of mutants after growth in each case.
 -   Comment on the variability of this fraction across replicates, in light of the result of question 3.
 
+```{r}
+# Parameters
+K <- 5e6  # Initial population size (bottleneck)
+n_grow <- 100  # Growth factor
+s <- 0.01  # Selection coefficient for mutants
+nmu <- 1  # Average number of mutations during growth phase
+n_replicates <- 10  # Number of replicate simulations to run
+
+# Install and load the flan package if needed
+if (!requireNamespace("flan", quietly = TRUE)) {
+  install.packages("flan")
+}
+library(flan)
+
+# Initialize results
+mutant_counts <- numeric(n_replicates)
+mutant_fractions <- numeric(n_replicates)
+total_cells <- K * n_grow
+
+# Simulate 10 replicates
+set.seed(42)  # For reproducibility
+for (i in 1:n_replicates) {
+  # First, simulate the number of mutation events using a Poisson distribution
+  # Since we expect 1 mutation in the whole population
+  n_mutations <- rpois(1, nmu)
+  
+  # For each mutation event, simulate the growth of the mutant lineage
+  total_mutants <- 0
+  if (n_mutations > 0) {
+    # Simulate each mutation event separately
+    for (j in 1:n_mutations) {
+      sim_data <- rflan(1, mutations = 1, fitness = 1/(1+s), mfn = n_grow)
+      total_mutants <- total_mutants + sim_data$mc
+    }
+  }
+  
+  mutant_counts[i] <- total_mutants
+  mutant_fractions[i] <- total_mutants / total_cells
+  
+  # Print progress
+  cat("Replicate", i, "completed\n")
+}
+
+# Display results
+print("Mutant counts in each replicate:")
+print(mutant_counts)
+print("Mutant fractions in each replicate:")
+print(format(mutant_fractions, scientific = TRUE))
+
+# Summary statistics
+mean_count <- mean(mutant_counts)
+sd_count <- sd(mutant_counts)
+mean_fraction <- mean(mutant_fractions)
+sd_fraction <- sd(mutant_fractions)
+cv_fraction <- sd_fraction / mean_fraction
+
+cat("\nSummary statistics:\n")
+cat("Mean mutant count:", mean_count, "\n")
+cat("SD of mutant count:", sd_count, "\n")
+cat("Mean mutant fraction:", format(mean_fraction, scientific = TRUE), "\n")
+cat("SD of mutant fraction:", format(sd_fraction, scientific = TRUE), "\n")
+cat("Coefficient of variation:", cv_fraction, "\n")
+
+```
+
+*The results show extreme variability in mutant counts across the 10 replicates:*
+
+*4 replicates produced zero mutants 5 replicates had low mutant counts (1-7) 1 replicate (replicate 2) had 70 mutants, which is dramatically higher than all others*
+
+*This pattern creates striking statistical properties:*
+
+*Mean mutant count: 9 Standard deviation: 21.61 Coefficient of variation: 2.40 (SD/mean)*
+
+*The standard deviation is more than twice the mean value, indicating extreme overdispersion. This directly connects to our findings in Question 3, where we observed a variance-to-mean ratio of approximately 118 for mutants arising from single cells. This variability can be explained by two key stochastic factors:*
+
+*Mutation timing: When a mutation occurs during the growth phase dramatically affects the final number of mutants. Early mutations produce exponentially more descendants than late mutations. Poisson variability in mutation events: Since mutations are rare events (average of 1 per growth phase across the whole population), some replicates have no mutations while others might have multiple.*
+
+*The outlier in replicate 2 (70 mutants) likely represents a case where either:*
+
+*Multiple mutation events occurred by chance, or A mutation occurred very early in the growth phase, allowing the mutant lineage to exploit its selective advantage (s=0.01) over more generations*
+
+*This extreme variability has important implications for experimental evolution:*
+
+*Replicate populations can follow dramatically different evolutionary trajectories Beneficial mutations may establish in some replicates but not others, purely by chance Population bottlenecks amplify this variability by randomly sampling from these highly variable distributions*
+
+*The results illustrate why large numbers of replicates are crucial in experimental evolution studies to account for the inherent stochasticity in mutation occurrence and establishment.*
+
 5.  In this question, we will consider a given dilution step, and we will call $k$ the number of mutants that are sampled to form the next bottleneck, which should comprise $K$ individuals.
 
 -   What is the name of the probability distribution that $k$ follows?
