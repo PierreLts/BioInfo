@@ -954,10 +954,10 @@ x <- 0.01       # Initial mutant fraction
 t <- 5          # Growth time
 N <- 1000       # Number of samples
 
-# Calculate x' (mutant fraction after growth)
+# Calculate x' (mutant fraction after growth) using the formula from question 2
 x_prime <- (x * exp(s * t)) / ((1 - x) + x * exp(s * t))
 
-# Sample k from binomial distribution
+# Sample k from binomial distribution B(K, x')
 k_samples <- rbinom(N, size = K, prob = x_prime)
 
 # Calculate mean and standard deviation
@@ -976,11 +976,11 @@ hist(k_samples,
      col = "#DE0099",
      breaks = 30)
 
-# Add mean line
+# Mean line
 abline(v = mean_k, col = "#FF7E1D", lwd = 2)
 ```
 
-*The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535.05 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.*
+*The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters* $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.
 
 7.  In this question, we will simulate the serial passage model. We will neglect new mutations that may happen during the process. Thus, the only mutants are those present initially, and we will assume that they have an initial fraction $x=0.01$.
 
@@ -988,3 +988,89 @@ abline(v = mean_k, col = "#FF7E1D", lwd = 2)
 -   Plot the fraction of mutants in the population versus the number of generations in 10 different realizations on the same plot.
 -   What are the characteristics and the long-term outcomes of these trajectories?
 -   What is this due to?
+
+```{r}
+# Parameters
+s <- 0.01       # Selection coefficient
+K <- 5e6        # Bottleneck size
+x_init <- 0.01  # Initial mutant fraction
+t <- 5          # Growth time
+n_bottlenecks <- 300  # Number of bottlenecks to simulate
+n_realizations <- 10  # Number of different realizations
+
+# Function to calculate mutant fraction after growth
+calculate_x_prime <- function(x, s, t) {
+  return((x * exp(s * t)) / ((1 - x) + x * exp(s * t)))
+}
+
+# Set up matrix to store results - rows are bottlenecks, columns are realizations
+x_values <- matrix(0, nrow = n_bottlenecks + 1, ncol = n_realizations)
+
+# Initialize all realizations with the same starting value
+x_values[1, ] <- x_init
+
+# Run simulations
+set.seed(123)  # For reproducibility
+for (j in 1:n_realizations) {
+  x <- x_init
+  for (i in 1:n_bottlenecks) {
+    # Calculate mutant fraction after growth
+    x_prime <- calculate_x_prime(x, s, t)
+    
+    # Sample for the next bottleneck
+    k <- rbinom(1, K, x_prime)
+    
+    # Calculate new mutant fraction
+    x <- k / K
+    
+    # Store the result
+    x_values[i + 1, j] <- x
+  }
+}
+
+# Calculate final mutant frequencies
+final_frequencies <- x_values[n_bottlenecks + 1, ]
+cat("Final mutant frequencies:", final_frequencies, "\n")
+cat("Mean final frequency:", mean(final_frequencies), "\n")
+
+# Calculate how many realizations reach different thresholds
+fixation_count <- sum(final_frequencies > 0.99)
+high_freq_count <- sum(final_frequencies > 0.5 & final_frequencies <= 0.99)
+low_freq_count <- sum(final_frequencies > 0.01 & final_frequencies <= 0.5)
+extinction_count <- sum(final_frequencies <= 0.01)
+
+cat("Realizations reaching fixation (>0.99):", fixation_count, "\n")
+cat("Realizations reaching high frequency (0.5-0.99):", high_freq_count, "\n")
+cat("Realizations maintaining low frequency (0.01-0.5):", low_freq_count, "\n")
+cat("Realizations with extinction or near-extinction (<0.01):", extinction_count, "\n")
+
+# Create a color palette
+colors <- rainbow(n_realizations)
+
+# Plot the results
+plot(0:n_bottlenecks, x_values[, 1], type = "l", col = colors[1],
+     xlab = "Number of bottlenecks", ylab = "Mutant fraction",
+     ylim = c(0, 1), main = "Serial passage model with selection (s=0.01)",
+     lwd = 2)
+
+# Add other realizations
+for (j in 2:n_realizations) {
+  lines(0:n_bottlenecks, x_values[, j], col = colors[j], lwd = 2)
+}
+
+# Add legend
+legend("topleft", legend = paste("Realization", 1:n_realizations),
+       col = colors, lty = 1, cex = 0.8, bg = "white")
+```
+
+*Analysis of Serial Passage Results*
+
+*The simulation results show remarkably consistent trajectories with all 10 realizations reaching near-complete fixation (\>0.999) by the end of 300 bottlenecks. This reveals:*
+
+*Deterministic dynamics dominate: The trajectories follow an almost perfect sigmoidal curve with minimal random variation. Selection overwhelmingly outweighs drift: With Ns = 50,000 (K×s = 5×10\^6 × 0.01), selection is approximately 50,000 times stronger than genetic drift, explaining why stochastic effects are nearly invisible. Minimal sampling variance: For a binomial process with such large populations, the standard deviation is negligibly small relative to the population size (\~0.022% at maximum variance).*
+
+*Implications This simulation demonstrates a practically deterministic regime of evolution where:*
+
+*Predictable outcomes: Large population sizes with moderate selection coefficients produce highly predictable evolutionary trajectories. Limited role for chance: Unlike in smaller populations where drift can lead to loss of beneficial mutations, here selection reliably drives beneficial mutations to fixation.*
+
+*To observe more stochastic effects and trajectory diversity, we would need a much smaller bottleneck size (e.g., K = 1,000) or a weaker selection coefficient (e.g., s = 0.0001).*
