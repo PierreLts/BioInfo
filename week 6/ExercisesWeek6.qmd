@@ -682,19 +682,19 @@ cat("Ratio of maximums (Flu/HIV):", max_ratio, "\n")
 
 [This tells us several important things about HIV evolution:]{style="color:#0066FF;"}
 
-[1. Rapid diversification: ]{style="color:#0066FF;"}
+[1. Rapid diversification:]{style="color:#0066FF;"}
 
 [Despite starting from a single founder virus just one month before seroconversion, HIV already shows substantial genetic diversity, more than half the mean diversity seen in global flu samples over an entire year.]{style="color:#0066FF;"}
 
-[2. High mutation rate: ]{style="color:#0066FF;"}
+[2. High mutation rate:]{style="color:#0066FF;"}
 
 [HIV's reverse transcriptase lacks proofreading capability, resulting in a high mutation rate that leads to this rapid within-host diversification early in infection.]{style="color:#0066FF;"}
 
-[3. Early quasispecies formation: ]{style="color:#0066FF;"}
+[3. Early quasispecies formation:]{style="color:#0066FF;"}
 
 [The bimodal distribution in the histogram suggests that HIV forms distinct viral populations (quasispecies) very early in infection, with many sequences showing very small distances (likely recent descendants from the founder virus) and another peak at greater distances (early adaptations).]{style="color:#0066FF;"}
 
-[4. Different evolutionary pressures: ]{style="color:#0066FF;"}
+[4. Different evolutionary pressures:]{style="color:#0066FF;"}
 
 [While flu evolves under selection pressure to escape population-level immunity across multiple hosts, HIV diversifies rapidly within a single host, reflecting its strategy of generating high variability to escape the developing immune response.]{style="color:#0066FF;"}
 
@@ -706,9 +706,13 @@ cat("Ratio of maximums (Flu/HIV):", max_ratio, "\n")
 
 1.  *In this first question, we neglect all mutations, and thus we assume that there are only wild-type individuals in the population. In the LTEE, serial transfer is performed everyday. Population size is multiplied by 100 at the end of the day, compared to the initial bottleneck at the beginning of the day. Recall that we assume for simplicity that growth is exponential. What is the value of* $t$ *that matches the LTEE?*
 
-[We need to determine the value of time $t$ that matches the LTEE conditions, where the population size is multiplied by 100 during each growth phase.]{style="color:#0066FF;"}
+[In the LTEE, the population undergoes exponential growth where:]{style="color:#0066FF;"}
 
-[In the LTEE, the population undergoes exponential growth where: - Initial size: $K$ (bottleneck) - Final size before transfer: $100K$ - Growth rate for wild-type: $r = 1$]{style="color:#0066FF;"}
+[- Initial size: $K$ (bottleneck)]{style="color:#0066FF;"}
+
+[- Final size before transfer: $100K$]{style="color:#0066FF;"}
+
+[- Growth rate for wild-type: $r = 1$]{style="color:#0066FF;"}
 
 [For exponential growth, the population size follows:]{style="color:#0066FF;"}
 
@@ -739,17 +743,20 @@ print(paste("Time t =", round(t, 4), "generations"))
 2.  In this question, we will consider that some mutants may be present initially, but that no new mutation may happen during the growth phase.
 
 -   Write the mutant fraction $x'$ after growth as a function of the mutant fraction $x$ before growth and of the parameters of the system.
--   Assuming that $s=0.01$ and $x=0.01$, taking $t=5$, and taking $K=5\times 10^6$ for the bottleneck size (matching the LTEE), compute the value of $x'$.
--   Same question if all values are the same except that $s=0.5$.
--   Compare the results obtained in these two cases, and comment.
-
-[\### a) Mathematical derivation of mutant fraction after growth]{style="color:#0066FF;"}
 
 [We derive the formula for the mutant fraction after growth.]{style="color:#0066FF;"}
 
-[We denote: - Initial wild-type population: $N_w(0) = (1-x)K$ - Initial mutant population: $N_m(0) = xK$]{style="color:#0066FF;"}
+[We denote:]{style="color:#0066FF;"}
 
-[During exponential growth with time $t$: - Wild-type after time $t$: $N_w(t) = (1-x)K \times e^t$ - Mutants after time $t$: $N_m(t) = xK \times e^{(1+s)t}$]{style="color:#0066FF;"}
+[- Initial wild-type population: $N_w(0) = (1-x)K$]{style="color:#0066FF;"}
+
+[- Initial mutant population: $N_m(0) = xK$]{style="color:#0066FF;"}
+
+[During exponential growth with time $t$: ]{style="color:#0066FF;"}
+
+[- Wild-type after time $t$: $N_w(t) = (1-x)K \times e^t$ ]{style="color:#0066FF;"}
+
+[- Mutants after time $t$: $N_m(t) = xK \times e^{(1+s)t}$]{style="color:#0066FF;"}
 
 [The new mutant fraction $x'$ is:]{style="color:#0066FF;"}
 
@@ -771,7 +778,8 @@ print(paste("Time t =", round(t, 4), "generations"))
 
 [This is our final formula for the mutant fraction after growth.]{style="color:#0066FF;"}
 
-[**Calculation for specific parameter values**]{style="color:#0066FF;"}
+-   Assuming that $s=0.01$ and $x=0.01$, taking $t=5$, and taking $K=5\times 10^6$ for the bottleneck size (matching the LTEE), compute the value of $x'$.
+-   Same question if all values are the same except that $s=0.5$.
 
 ```{r}
 # Function to calculate mutant fraction after growth
@@ -794,13 +802,19 @@ cat("Fold increase for s=0.01:", case1/0.01, "\n")
 cat("Fold increase for s=0.5:", case2/0.01, "\n")
 ```
 
-[**Comparison and commentary**]{style="color:#0066FF;"}
+-   Compare the results obtained in these two cases, and comment.
 
 [The results demonstrate the significant impact of selection coefficient ($s$) on the evolutionary dynamics:]{style="color:#0066FF;"}
 
-[1. **With weak selection (**$s=0.01$): - The mutant fraction increases from 0.01 to 0.01050732, which is precisely a 5.0732% increase - The fold increase is exactly 1.050732 - This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition]{style="color:#0066FF;"}
+[**1. With weak selection (**$s=0.01$**):** ]{style="color:#0066FF;"}
 
-[2. **With strong selection (**$s=0.5$):]{style="color:#0066FF;"}
+[- The mutant fraction increases from 0.01 to 0.01050732, which is precisely a 5.0732% increase ]{style="color:#0066FF;"}
+
+[- The fold increase is exactly 1.050732 ]{style="color:#0066FF;"}
+
+[- This suggests that under weak selection, many bottleneck cycles would be needed to significantly change the population composition]{style="color:#0066FF;"}
+
+[**2. With strong selection (**$s=0.5$**):**]{style="color:#0066FF;"}
 
 [- The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase]{style="color:#0066FF;"}
 
@@ -808,7 +822,7 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 
 [- Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency]{style="color:#0066FF;"}
 
-[3. **Implications for experimental evolution**:]{style="color:#0066FF;"}
+[**3. Implications for experimental evolution:**]{style="color:#0066FF;"}
 
 [- The selection coefficient is a critical parameter determining the rate of adaptation]{style="color:#0066FF;"}
 
@@ -818,11 +832,13 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 
 [- Mutations with large fitness advantages (like $s=0.5$) would be expected to dominate even after a few cycles]{style="color:#0066FF;"}
 
-[4. **Mathematical explanation**:]{style="color:#0066FF;"}
+[**4. Mathematical explanation:**]{style="color:#0066FF;"}
 
 [- The exponential term $e^{st}$ amplifies even small differences in $s$ over time]{style="color:#0066FF;"}
 
-[- For $s=0.01$ and $t=5$, we get $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$]{style="color:#0066FF;"} [- For $s=0.5$ and $t=5$, we get $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$]{style="color:#0066FF;"}
+[- For $s=0.01$ and $t=5$, we get $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$]{style="color:#0066FF;"}
+
+[- For $s=0.5$ and $t=5$, we get $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$]{style="color:#0066FF;"}
 
 [- This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change]{style="color:#0066FF;"}
 
@@ -832,8 +848,6 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 
 -   Use *rflan* to sample N=1000 times the final number of mutants after growth with nmu=1, s=0.01 and n_grow=100.
 -   Calculate the mean and the variance of the final number of mutants over these N=1000 replicate realizations.
--   How does the variance compare to the mean?
--   What causes this?
 
 ```{r}
 # Install and load the flan package if not already installed
@@ -864,7 +878,11 @@ cat("Variance of mutants:", var_mutants, "\n")
 cat("Variance-to-mean ratio:", var_mutants/mean_mutants, "\n")
 ```
 
-[The variance (658.1651) is dramatically larger than the mean (5.584), with a variance-to-mean ratio of approximately 117.87. This represents extreme overdispersion, as a Poisson distribution would have a variance-to-mean ratio of 1]{style="color:#0066FF;"}
+-   How does the variance compare to the mean?
+
+[The variance (658.1651) is a lot larger than the mean (5.584), with a variance-to-mean ratio of approximately 117.87. This represents extreme overdispersion, as a Poisson distribution would have a variance-to-mean ratio of 1]{style="color:#0066FF;"}
+
+-   What causes this?
 
 [This extreme overdispersion is caused by two key factors:]{style="color:#0066FF;"}
 
@@ -878,7 +896,6 @@ cat("Variance-to-mean ratio:", var_mutants/mean_mutants, "\n")
 
 -   Simulate 10 replicates of the outcome of this growth phase (with the same initial conditions), using *rflan*. Note: this takes a bit of computational time.
 -   Calculate the final fraction of mutants after growth in each case.
--   Comment on the variability of this fraction across replicates, in light of the result of question 3.
 
 ```{r}
 # Parameters
@@ -951,40 +968,61 @@ cat("Coefficient of variation:", cv_fraction, "\n")
 
 [This pattern creates striking statistical properties:\*]{style="color:#0066FF;"}
 
-[Mean mutant count: 9 Standard deviation: 21.61 Coefficient of variation: 2.40 (SD/mean)]{style="color:#0066FF;"}
+[Mean mutant count: 9 ]{style="color:#0066FF;"}
 
-[The standard deviation is more than twice the mean value, indicating extreme overdispersion. This directly connects to our findings in Question 3, where we observed a variance-to-mean ratio of approximately 118 for mutants arising from single cells. This variability can be explained by two key stochastic factors:]{style="color:#0066FF;"}
+[Standard deviation: 21.61 Coefficient of variation: 2.40 (SD/mean)]{style="color:#0066FF;"}
 
-[Mutation timing: When a mutation occurs during the growth phase dramatically affects the final number of mutants. Early mutations produce exponentially more descendants than late mutations. Poisson variability in mutation events: Since mutations are rare events (average of 1 per growth phase across the whole population), some replicates have no mutations while others might have multiple.]{style="color:#0066FF;"}
+[The standard deviation is more than twice the mean value, indicating high overdispersion. This directly connects to our findings in Question 3, where we observed a variance-to-mean ratio of approximately 118 for mutants arising from single cells. ]{style="color:#0066FF;"}
+
+-   What causes this?
+
+[This variability can be explained by two key stochastic factors:]{style="color:#0066FF;"}
+
+[**Mutation timing:** When a mutation occurs during the growth phase dramatically affects the final number of mutants. Early mutations produce exponentially more descendants than late mutations. ]{style="color:#0066FF;"}
+
+[**Poisson variability in mutation events:** Since mutations are rare events (average of 1 per growth phase across the whole population), some replicates have no mutations while others might have multiple.]{style="color:#0066FF;"}
 
 [The outlier in replicate 2 (70 mutants) likely represents a case where either:]{style="color:#0066FF;"}
 
-[Multiple mutation events occurred by chance, or A mutation occurred very early in the growth phase, allowing the mutant lineage to exploit its selective advantage (s=0.01) over more generations]{style="color:#0066FF;"}
+[Multiple mutation events occurred by chance, or a mutation occurred very early in the growth phase, allowing the mutant lineage to exploit its selective advantage (s=0.01) over more generations]{style="color:#0066FF;"}
 
 [This extreme variability has important implications for experimental evolution:]{style="color:#0066FF;"}
 
 [Replicate populations can follow dramatically different evolutionary trajectories Beneficial mutations may establish in some replicates but not others, purely by chance Population bottlenecks amplify this variability by randomly sampling from these highly variable distributions]{style="color:#0066FF;"}
 
-[The results illustrate why large numbers of replicates are crucial in experimental evolution studies to account for the inherent stochasticity in mutation occurrence and establishment.]{style="color:#0066FF;"}
+[The results illustrate why large numbers of replicates are important in experimental evolution studies to account for the inherent stochasticity in mutation occurrence and establishment.]{style="color:#0066FF;"}
 
 5.  In this question, we will consider a given dilution step, and we will call $k$ the number of mutants that are sampled to form the next bottleneck, which should comprise $K$ individuals.
 
 -   What is the name of the probability distribution that $k$ follows?
+
+[The number of mutants $k$ sampled to form the next bottleneck follows a **binomial distribution**.]{style="color:#0066FF;"}
+
+[This is because:]{style="color:#0066FF;"}
+
+[- We're sampling $K$ individuals from a large population]{style="color:#0066FF;"}
+
+[- Each individual sampled is either a mutant (with probability $x'$) or wild-type (with probability $1-x'$)]{style="color:#0066FF;"}
+
+[- Each sampling event is independent ]{style="color:#0066FF;"}
+
+[- We're interested in the number of successes (mutants) in $K$ trials]{style="color:#0066FF;"}
+
 -   Write the formula for the probability $P(k)$ to obtain a given value of $k$. Note: here, if possible, we recommend using LaTeX for presentation quality.
 
-[\### a) Probability distribution for the number of mutants sampled]{style="color:#0066FF;"}
-
-[The number of mutants\* $k$ sampled to form the next bottleneck follows a **binomial distribution**.]{style="color:#0066FF;"}
-
-[This is because:]{style="color:#0066FF;"} [- We're sampling\* $K$ \*individuals from a large population]{style="color:#0066FF;"} [- Each individual sampled is either a mutant (with probability $x'$) or wild-type (with probability $1-x'$)]{style="color:#0066FF;"} [- Each sampling event is independent - We're interested in the number of "successes" (mutants) in $K$ trials]{style="color:#0066FF;"}
-
-[\### b) Formula for the probability $P(k)$]{style="color:#0066FF;"}
-
-[The probability of sampling exactly\* $k$ *mutants when forming a bottleneck of size* $K$ \*is given by:]{style="color:#0066FF;"}
+[The probability of sampling exactly $k$ *mutants when forming a bottleneck of size* $K$ is given by:]{style="color:#0066FF;"}
 
 [$$P(k) = \binom{K}{k} (x')^k (1-x')^{K-k}$$]{style="color:#0066FF;"}
 
-[Where:]{style="color:#0066FF;"} [- $k$ is the number of mutants sampled ($0 \leq k \leq K$)]{style="color:#0066FF;"} [- $K$ is the bottleneck size]{style="color:#0066FF;"} [- $x'$ is the mutant fraction after growth]{style="color:#0066FF;"} [- $\binom{K}{k} = \frac{K!}{k!(K-k)!}$ is the binomial coefficient]{style="color:#0066FF;"}
+[Where:]{style="color:#0066FF;"}
+
+[- $k$ is the number of mutants sampled ($0 \leq k \leq K$)]{style="color:#0066FF;"}
+
+[- $K$ is the bottleneck size]{style="color:#0066FF;"}
+
+[- $x'$ is the mutant fraction after growth]{style="color:#0066FF;"}
+
+[- $\binom{K}{k} = \frac{K!}{k!(K-k)!}$ is the binomial coefficient]{style="color:#0066FF;"}
 
 [This formula represents the probability mass function of the binomial distribution $B(K, x')$.]{style="color:#0066FF;"}
 
@@ -1025,17 +1063,15 @@ hist(k_samples,
      breaks = 30)
 
 # Mean line
-abline(v = mean_k, col = "#DE0099", lwd = 2)
+abline(v = mean_k, col = "#B300F2", lwd = 2)
 ```
 
-[The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.]{style="color:#0066FF;"}
+[The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.]{style="color:#0066FF;"}
 
 7.  In this question, we will simulate the serial passage model. We will neglect new mutations that may happen during the process. Thus, the only mutants are those present initially, and we will assume that they have an initial fraction $x=0.01$.
 
 -   Simulate the serial passage model described above with $s=0.01$, $K=5\times 10^6$ and $x=0.01$, and taking $t=5$, for 300 bottlenecks.
 -   Plot the fraction of mutants in the population versus the number of generations in 10 different realizations on the same plot.
--   What are the characteristics and the long-term outcomes of these trajectories?
--   What is this due to?
 
 ```{r}
 # Parameters
@@ -1111,17 +1147,25 @@ legend("topleft", legend = paste("Realization", 1:n_realizations),
        col = colors, lty = 1, cex = 0.8, bg = "white")
 ```
 
-[Analysis of Serial Passage Results]{style="color:#0066FF;"}
+-   What are the characteristics and the long-term outcomes of these trajectories?
 
 [The simulation results show remarkably consistent trajectories with all 10 realizations reaching near-complete fixation (\>0.999) by the end of 300 bottlenecks. This reveals:]{style="color:#0066FF;"}
 
-[Deterministic dynamics dominate: The trajectories follow an almost perfect sigmoidal curve with minimal random variation. Selection overwhelmingly outweighs drift: With Ns = 50,000 (K×s = 5×10\^6 × 0.01), selection is approximately 50,000 times stronger than genetic drift, explaining why stochastic effects are nearly invisible. Minimal sampling variance: For a binomial process with such large populations, the standard deviation is negligibly small relative to the population size (\~0.022% at maximum variance).]{style="color:#0066FF;"}
+[**Deterministic dynamics dominate:** The trajectories follow an almost perfect sigmoidal curve with minimal random variation. ]{style="color:#0066FF;"}
 
-[Implications This simulation demonstrates a practically deterministic regime of evolution where:]{style="color:#0066FF;"}
+[**Selection overwhelmingly outweighs drift:** With Ns = 50,000 (K×s = 5×10\^6 × 0.01), selection is approximately 50,000 times stronger than genetic drift, explaining why stochastic effects are nearly invisible. ]{style="color:#0066FF;"}
 
-[Predictable outcomes: Large population sizes with moderate selection coefficients produce highly predictable evolutionary trajectories. Limited role for chance: Unlike in smaller populations where drift can lead to loss of beneficial mutations, here selection reliably drives beneficial mutations to fixation.]{style="color:#0066FF;"}
+[**Minimal sampling variance:** For a binomial process with such large populations, the standard deviation is negligibly small relative to the population size (\~0.022% at maximum variance).]{style="color:#0066FF;"}
 
-[To observe more stochastic effects and trajectory diversity, we would need a much smaller bottleneck size (e.g., K = 5,000) or a weaker selection coefficient (e.g., s = 0.0001).]{style="color:#0066FF;"}
+-   What is this due to?
+
+[This simulation demonstrates a practically deterministic regime of evolution where:]{style="color:#0066FF;"}
+
+[**Predictable outcomes**: Large population sizes with moderate selection coefficients produce highly predictable evolutionary trajectories. ]{style="color:#0066FF;"}
+
+[**Limited role for chance:** Unlike in smaller populations where drift can lead to loss of beneficial mutations, here selection reliably drives beneficial mutations to fixation.]{style="color:#0066FF;"}
+
+[To observe more stochastic effects and trajectory diversity, we would need a much smaller bottleneck size (e.g., K = 5,000) or a weaker selection coefficient (e.g., s = 0.0001):]{style="color:#0066FF;"}
 
 ```{r}
 # Parameters
