@@ -44,7 +44,7 @@ sequences <- read.dna("sequences1.fasta", format = "fasta")
 # Load annotations
 annotations <- read.csv("annot1.csv")
 
-# Inspect the first few rows of annotations
+# Print the first few rows of annotations
 head(annotations)
 ```
 
@@ -58,8 +58,8 @@ head(annotations)
 *Clue for question 2:* for visualization, you can tune figure height and width, e.g. by including the following two lines at the beginning of your code: "#\| fig-height: 20" and "#\| fig-width: 12".
 
 ```{r}
-#| fig-height: 16
-#| fig-width: 10
+#| fig-height: 36
+#| fig-width: 25
 
 # Calculate pairwise distances using Jukes-Cantor model
 dist_matrix <- dist.dna(sequences, model = "JC69")
@@ -79,7 +79,7 @@ stretched_tree <- rooted_tree
 # Find the reference branch index
 ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
 
-# Use a moderate stretching factor
+# Stretching the tree for better visualization
 for (i in 1:nrow(stretched_tree$edge)) {
   if (i != ref_edge_idx) {
     stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 8
@@ -143,24 +143,24 @@ if (sum(!is.na(tip_days)) > 0) {
 }
 
 # Set up plotting area with more space on the right
-par(mar = c(1, 1, 3, 10), xpd = TRUE)  # Increased right margin
+par(mar = c(1, 1, 3, 15), xpd = TRUE)  # Increased right margin
 
 # Plot the stretched tree
 plot(stretched_tree, show.tip.label = FALSE, 
      main = "HIV Phylogenetic Tree Colored by Days from Seroconversion",
-     cex = 0.8,
-     edge.width = 1.2,
+     cex = 2.5,
+     edge.width = 3,
      direction = "rightwards")
 
 # Add colored dots for each tip
-tiplabels(pch = 19, col = tip_colors, cex = 1.2)
+tiplabels(pch = 19, col = tip_colors, cex = 3)
 
 # Add days labels next to the tips
 tiplabels(
   text = ifelse(is.na(tip_days), "", as.character(tip_days)),
   adj = c(-0.5, 0.5),
   frame = "none",
-  cex = 0.7,
+  cex = 2.2,
   col = "black"
 )
 
@@ -173,30 +173,30 @@ tiplabels(
   tip = ref_tip_index,
   adj = c(-0.2, 0.5),  # Position the text to the right of the tip
   frame = "none",
-  cex = 0.9,
+  cex = 2.5,
   col = "#0066FF",
   font = 2  # Bold text
 )
 
-# SIMPLIFIED LEGEND WITHOUT FRAME AND REFERENCE
+# LEGEND
 # Get plot dimensions
 plot_dims <- par("usr")
 
 # Position parameters for legend
-legend_x <- plot_dims[2] * 1.03  # Positioned further to the right 
+legend_x <- plot_dims[2] * 1  # Positioned further to the right 
 legend_y_top <- plot_dims[4] * 0.7  # Positioned in upper part
 legend_width <- (plot_dims[2] - plot_dims[1]) * 0.02  # Very narrow, proportional width
-legend_height <- (plot_dims[4] - plot_dims[3]) * 0.3  # Shorter height
+legend_height <- (plot_dims[4] - plot_dims[3]) * 0.25  # Shorter height
 
 # Increase spacing between title and gradient bar
-title_spacing <- legend_width * 600  # Much larger spacing
+title_spacing <- legend_width * 700  # Much larger spacing
 
 # Add title for legend with significantly more space above the bar
 text(
   legend_x + legend_width,
   legend_y_top + title_spacing,  # Greatly increased vertical space
   "Days after\nseroconversion",
-  cex = 0.9,
+  cex = 2.5,
   font = 2
 )
 
@@ -207,7 +207,7 @@ gradient_y_bottom <- legend_y_top - legend_height
 gradient_bar_width <- legend_width/2
 
 # Create gradient segments
-num_segments <- 50  # More segments for smoother gradient
+num_segments <- 50  # Smooth gradient
 gradient_heights <- seq(gradient_y_bottom, gradient_y_top, length.out = num_segments+1)
 gradient_colors <- color_gradient(num_segments)
 
@@ -222,16 +222,13 @@ for (i in 1:num_segments) {
   )
 }
 
-# Set vertical spacing between labels to avoid overlap
-vertical_spacing <- legend_height / 5
-
-# Define key day values to show with better spacing
+# Define key day values to show
 key_days <- c(1632, 1394, 1072, 323)
 ref_y_positions <- c(
-  gradient_y_top,                        # 1632 (top)
-  gradient_y_top - vertical_spacing,     # 1394
-  gradient_y_top - 2.5*vertical_spacing, # 1072 
-  gradient_y_bottom                      # 323 (bottom)
+  gradient_y_top,                               # 1632 (top)
+  gradient_y_top - (1-1394/1632)*legend_height, # 1394
+  gradient_y_top - (1-1072/1632)*legend_height, # 1072 
+  gradient_y_bottom                             # 323 (bottom)
 )
 
 # Add tick marks and day labels with appropriate spacing
@@ -254,7 +251,7 @@ for (i in 1:length(key_days)) {
     y_pos,
     labels = as.character(day),
     pos = 4,
-    cex = 0.8,
+    cex = 2.5,
     offset = 0.1
   )
 }
@@ -264,11 +261,11 @@ for (i in 1:length(key_days)) {
 
 -   How are sequences collected at recent time points positioned on the tree in general?
 
-[Sequences collected at more recent time points (Intermediate: 1072-1394 days and Late: 1632 days) tend to be positioned further from the root of the tree compared to the Early sequences (323 days). This creates a general pattern where evolutionary distance from the root correlates with time of collection, with deeper branches containing more recent sequences.]{style="color:#B300F2;"}
+[Sequences collected at more recent time points (Intermediate: 1072-1394 days and Late: 1632 days) tend to be positioned further from the root of the tree compared to the Early sequences (323 days). This creates a general pattern where evolutionary distance from the root correlates with time of collection, with deeper branches containing more recent sequences.]{style="color:#0066FF;"}
 
 -   What does this reflect?
 
-[This pattern reflects the ongoing evolutionary process of HIV within this patient over time. It shows that HIV undergoes continuous genetic diversification and adaptation within a single host. This is consistent with HIV's high mutation rate and the selective pressures it faces from the host immune system. As time progresses, viral populations accumulate mutations and diverge further from the initial infecting strains.]{style="color:#B300F2;"}
+[This pattern reflects the ongoing evolutionary process of HIV within this patient over time. It shows that HIV undergoes continuous genetic diversification and adaptation within a single host. This is consistent with HIV's high mutation rate and the selective pressures it faces from the host immune system. As time progresses, viral populations accumulate mutations and diverge further from the initial infecting strains.]{style="color:#0066FF;"}
 
 -   How many exceptions are there to this trend, and when were they collected (in days after seroconversion)?
 
@@ -276,7 +273,7 @@ for (i in 1:length(key_days)) {
 
 [9 Early sequences (all collected at 323 days post-seroconversion) appear deeper in the tree than expected for their collection time, showing greater evolutionary distance]{style="color:#0066FF;"}
 
-\[4 Late sequences (collected at 1394-1632 days post-seroconversion) appear closer to the root than expected, showing less evolutionary distance\]{style="color:#0066FF;"}
+[4 Late sequences (collected at 1394-1632 days post-seroconversion) appear closer to the root than expected, showing less evolutionary distance]{style="color:#0066FF;"}
 
 -   What can we conclude about these exceptions?
 
@@ -299,15 +296,15 @@ The data file "sequences2.fasta" contains sequences extracted from HIV genomes t
 *Clue for question 4:* for visualization, you can tune figure height and width, e.g. by including the following two lines at the beginning of your code: "#\| fig-height: 12" and "#\| fig-width: 12".
 
 ```{r}
+#| fig-height: 25
+#| fig-width: 25
+
 # Load the sequences
 sequences <- read.dna("sequences2.fasta", format = "fasta")
 
 # Load annotations
 annotations <- read.csv("annot2.csv")
 
-
-#| fig-height: 15
-#| fig-width: 15
 
 # Calculate pairwise distances using Jukes-Cantor model
 dist_matrix <- dist.dna(sequences, model = "JC69")
@@ -324,16 +321,16 @@ rooted_tree <- ladderize(rooted_tree)
 # Manually expand the horizontal component of the edges
 stretched_tree <- rooted_tree
 
-# Find the reference branch index
+# Stretching the tree for better visualization
 ref_edge_idx <- which(stretched_tree$edge[,2] == 1)
 
 # Use a moderate stretching factor
 for (i in 1:nrow(stretched_tree$edge)) {
   if (i != ref_edge_idx) {
-    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 10
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 4
   } else {
     # Slightly shorten the reference branch
-    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.8
+    stretched_tree$edge.length[i] <- stretched_tree$edge.length[i] * 0.3
   }
 }
 
@@ -361,7 +358,7 @@ for (i in 1:length(stretched_tree$tip.label)) {
 print(paste("Number of tips with assigned days:", sum(!is.na(tip_days))))
 print(paste("Range of days:", min(tip_days, na.rm = TRUE), "to", max(tip_days, na.rm = TRUE)))
 
-# Set up color gradient (correctly ordered)
+# Set up color gradient
 library(grDevices)
 # Fix the gradient: purple to magenta to orange
 color_gradient <- colorRampPalette(c("#B300F2", "#DE0099", "#FF7E1D"))
@@ -391,24 +388,24 @@ if (sum(!is.na(tip_days)) > 0) {
 }
 
 # Set up plotting area with more space on the right
-par(mar = c(1, 5, 1, 5), xpd = TRUE)  # Increased right margin
+par(mar = c(1, 20, 1, 20), xpd = TRUE)  # Increased right margin
 
 # Plot the stretched tree
 plot(stretched_tree, show.tip.label = FALSE, 
      main = "HIV Phylogenetic Tree Colored by Days from Seroconversion",
-     cex = 0.8,
-     edge.width = 1.2,
+     cex = 2.5,
+     edge.width = 3,
      direction = "rightwards")
 
 # Add colored dots for each tip
-tiplabels(pch = 19, col = tip_colors, cex = 1.2)
+tiplabels(pch = 19, col = tip_colors, cex = 3)
 
 # Add days labels next to the tips
 tiplabels(
   text = ifelse(is.na(tip_days), "", as.character(tip_days)),
-  adj = c(-0.5, 0.5),
+  adj = c(-0.8, 0.5),
   frame = "none",
-  cex = 0.7,
+  cex = 2.5,
   col = "black"
 )
 
@@ -421,30 +418,30 @@ tiplabels(
   tip = ref_tip_index,
   adj = c(-0.2, 0.5),  # Position the text to the right of the tip
   frame = "none",
-  cex = 0.9,
+  cex = 2.5,
   col = "#0066FF",
   font = 2  # Bold text
 )
 
-# SIMPLIFIED LEGEND WITHOUT FRAME AND REFERENCE
+# LEGEND
 # Get plot dimensions
 plot_dims <- par("usr")
 
 # Position parameters for legend
-legend_x <- plot_dims[2] * 1.03  # Positioned further to the right 
+legend_x <- plot_dims[2] * 0.9  # Positioned further to the right 
 legend_y_top <- plot_dims[4] * 0.7  # Positioned in upper part
-legend_width <- (plot_dims[2] - plot_dims[1]) * 0.02  # Very narrow, proportional width
-legend_height <- (plot_dims[4] - plot_dims[3]) * 0.3  # Shorter height
+legend_width <- (plot_dims[2] - plot_dims[1]) * 0.025  # narrow, proportional width
+legend_height <- (plot_dims[4] - plot_dims[3]) * 0.35  # height
 
 # Increase spacing between title and gradient bar
-title_spacing <- legend_width * 1900  # Much larger spacing
+title_spacing <- legend_width * 1700
 
 # Add title for legend with significantly more space above the bar
 text(
   legend_x + legend_width,
   legend_y_top + title_spacing,  # Greatly increased vertical space
   "Days after\nseroconversion",
-  cex = 0.9,
+  cex = 2.5,
   font = 2
 )
 
@@ -455,7 +452,7 @@ gradient_y_bottom <- legend_y_top - legend_height
 gradient_bar_width <- legend_width/2
 
 # Create gradient segments
-num_segments <- 50  # More segments for smoother gradient
+num_segments <- 50  # Smooth gradient
 gradient_heights <- seq(gradient_y_bottom, gradient_y_top, length.out = num_segments+1)
 gradient_colors <- color_gradient(num_segments)
 
@@ -470,16 +467,15 @@ for (i in 1:num_segments) {
   )
 }
 
-# Set vertical spacing between labels to avoid overlap
-vertical_spacing <- legend_height / 5
 
 # Define key day values to show with better spacing
-key_days <- c(199, 115, 59, 0)
+key_days <- c(199, 115, 59, 31, 0)
 ref_y_positions <- c(
-  gradient_y_top,                        # 1632 (top)
-  gradient_y_top - vertical_spacing,     # 1394
-  gradient_y_top - 2.5*vertical_spacing, # 1072 
-  gradient_y_bottom                      # 323 (bottom)
+  gradient_y_top,                             # 199 (top)
+  gradient_y_top - (1-115/199)*legend_height, # 115
+  gradient_y_top - (1-59/199)*legend_height,  # 59 
+  gradient_y_top - (1-31/199)*legend_height,  # 31
+  gradient_y_bottom                           # 0 (bottom)
 )
 
 # Add tick marks and day labels with appropriate spacing
@@ -502,7 +498,7 @@ for (i in 1:length(key_days)) {
     y_pos,
     labels = as.character(day),
     pos = 4,
-    cex = 0.8,
+    cex = 2.5,
     offset = 0.1
   )
 }
@@ -566,7 +562,7 @@ if(length(late_seq_indices) > 0) {
 
 -   Where are they positioned on the tree?
 
-    [The late sequences are actually slightly closer to the root (average evolutionary distance 0.02414197) compared to early sequences (average distance 0.02507641).]{style="color:#0066FF;"}
+    [The late sequences are actually slightly closer to the root (average evolutionary distance 0.04023662) compared to early sequences (average distance 0.04179402).]{style="color:#0066FF;"}
 
     [They don't form a monophyletic group, indicating they evolved independently.]{style="color:#0066FF;"}
 
@@ -588,8 +584,6 @@ if(length(late_seq_indices) > 0) {
 
     [The sampling might have been from different anatomical compartments where viral evolution proceeds at different rates.]{style="color:#0066FF;"}
 
-    [The second patient might represent a case of HIV superinfection or initial infection with multiple founder viruses with different evolutionary trajectories.]{style="color:#0066FF;"}
-
 6.  In this question, we will focus on sequences that were collected at seroconversion.
 
 -   Extract all the sequences from this second patient that were collected at exactly 0 day after seroconversion, and form a smaller list of sequences with these sequences.
@@ -599,16 +593,13 @@ if(length(late_seq_indices) > 0) {
 -   Calculate their mean and their maximum value.
 
 ```{r}
-# Load required libraries
 library(ape)
 
-# Load the sequences
+# Load the data
 sequences2 <- read.dna("sequences2.fasta", format = "fasta")
-
-# Load annotations
 annotations <- read.csv("annot2.csv")
 
-# Find sequences with 0 days after seroconversion
+# Sequences with 0 days after seroconversion
 day0_indices <- which(annotations$DaysFromSeroconversion == 0 & !is.na(annotations$DaysFromSeroconversion))
 day0_names <- annotations$Name[day0_indices]
 cat("Day 0 sequences found:", length(day0_indices), "\n")
@@ -639,7 +630,7 @@ if (length(day0_seq_indices) >= 2) {
   hist(day0_distances, 
        main = "Distribution of Jukes-Cantor Distances at Seroconversion (Day 0)",
        xlab = "Jukes-Cantor Distance", 
-       col = "#DE0099",
+       col = "#FF7E1D",
        breaks = 20)
   
   # Calculate and print mean and maximum
@@ -656,8 +647,6 @@ if (length(day0_seq_indices) >= 2) {
 7.  For the flu virus, the mean Jukes-Cantor distance between all sequences collected across the world in a given year is 0.008 and the maximum Jukes-Cantor distance between sequences in a given year is 0.04.
 
 -   Compare these values to those observed in question 6, in orders of magnitude.
-
--   What does this tell us about HIV evolution?
 
 *Note for question 7:* for HIV, seroconversion takes about one month after infection, and the vast majority of HIV-1 infections are initiated by a single, genetically homogeneous founder virus variant.
 
@@ -681,7 +670,9 @@ cat("Maximum distances: HIV =", hiv_max_distance, "vs Flu =", flu_max_distance, 
 cat("Ratio of maximums (Flu/HIV):", max_ratio, "\n")
 ```
 
-[\### HIV vs. Flu Evolution]{style="color:#0066FF;"}
+-   What does this tell us about HIV evolution?
+
+[**HIV vs. Flu Evolution**]{style="color:#0066FF;"}
 
 [The comparison between HIV at seroconversion and global flu samples over a year reveals striking differences in viral evolution:]{style="color:#0066FF;"}
 
@@ -691,15 +682,23 @@ cat("Ratio of maximums (Flu/HIV):", max_ratio, "\n")
 
 [This tells us several important things about HIV evolution:]{style="color:#0066FF;"}
 
-[1. **Remarkably rapid diversification**: Despite starting from a single founder virus just one month before seroconversion, HIV already shows substantial genetic diversity - more than half the mean diversity seen in global flu samples over an entire year.]{style="color:#0066FF;"}
+[1. Rapid diversification: ]{style="color:#0066FF;"}
 
-[2. **Extreme mutation rate**: HIV's reverse transcriptase lacks proofreading capability, resulting in an extraordinarily high mutation rate that leads to this rapid within-host diversification early in infection.]{style="color:#0066FF;"}
+[Despite starting from a single founder virus just one month before seroconversion, HIV already shows substantial genetic diversity, more than half the mean diversity seen in global flu samples over an entire year.]{style="color:#0066FF;"}
 
-[3. **Early quasispecies formation**: The bimodal distribution in the histogram suggests that HIV forms distinct viral populations (quasispecies) very early in infection, with many sequences showing very small distances (likely recent descendants from the founder virus) and another peak at greater distances (early adaptations).]{style="color:#0066FF;"}
+[2. High mutation rate: ]{style="color:#0066FF;"}
 
-[4. **Different evolutionary pressures**: While flu evolves under selection pressure to escape population-level immunity across multiple hosts, HIV diversifies rapidly within a single host, reflecting its strategy of generating high variability to escape the developing immune response.]{style="color:#0066FF;"}
+[HIV's reverse transcriptase lacks proofreading capability, resulting in a high mutation rate that leads to this rapid within-host diversification early in infection.]{style="color:#0066FF;"}
 
-[The substantial diversity observed at seroconversion underscores HIV's exceptional capacity for evolutionary adaptation, explaining its ability to persist despite immune responses and develop resistance to antiretroviral drugs.]{style="color:#0066FF;"}
+[3. Early quasispecies formation: ]{style="color:#0066FF;"}
+
+[The bimodal distribution in the histogram suggests that HIV forms distinct viral populations (quasispecies) very early in infection, with many sequences showing very small distances (likely recent descendants from the founder virus) and another peak at greater distances (early adaptations).]{style="color:#0066FF;"}
+
+[4. Different evolutionary pressures: ]{style="color:#0066FF;"}
+
+[While flu evolves under selection pressure to escape population-level immunity across multiple hosts, HIV diversifies rapidly within a single host, reflecting its strategy of generating high variability to escape the developing immune response.]{style="color:#0066FF;"}
+
+[The substantial diversity observed at seroconversion shows HIV's capacity for evolutionary adaptation, explaining its ability to persist despite immune responses and develop resistance to antiretroviral drugs.]{style="color:#0066FF;"}
 
 ## Exercise 2 - Simulating experimental evolution with serial passage and mutations
 
@@ -772,7 +771,7 @@ print(paste("Time t =", round(t, 4), "generations"))
 
 [This is our final formula for the mutant fraction after growth.]{style="color:#0066FF;"}
 
-[\### b) Calculation for specific parameter values]{style="color:#0066FF;"}
+[**Calculation for specific parameter values**]{style="color:#0066FF;"}
 
 ```{r}
 # Function to calculate mutant fraction after growth
@@ -795,7 +794,7 @@ cat("Fold increase for s=0.01:", case1/0.01, "\n")
 cat("Fold increase for s=0.5:", case2/0.01, "\n")
 ```
 
-[\### c) Comparison and commentary]{style="color:#0066FF;"}
+[**Comparison and commentary**]{style="color:#0066FF;"}
 
 [The results demonstrate the significant impact of selection coefficient ($s$) on the evolutionary dynamics:]{style="color:#0066FF;"}
 
@@ -803,15 +802,29 @@ cat("Fold increase for s=0.5:", case2/0.01, "\n")
 
 [2. **With strong selection (**$s=0.5$):]{style="color:#0066FF;"}
 
-[- The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase]{style="color:#0066FF;"} [- In percentage terms, this represents a dramatic 995.721% increase]{style="color:#0066FF;"} [- Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency]{style="color:#0066FF;"}
+[- The mutant fraction increases from 0.01 to 0.1095721, which is a 10.95721-fold increase]{style="color:#0066FF;"}
+
+[- In percentage terms, this represents a dramatic 995.721% increase]{style="color:#0066FF;"}
+
+[- Even in a single growth cycle, strongly beneficial mutations can substantially increase in frequency]{style="color:#0066FF;"}
 
 [3. **Implications for experimental evolution**:]{style="color:#0066FF;"}
 
-[- The selection coefficient is a critical parameter determining the rate of adaptation]{style="color:#0066FF;"} [- In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population]{style="color:#0066FF;"} [- For mutations with small fitness advantages (like $s=0.01$), genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation]{style="color:#0066FF;"} [- Mutations with large fitness advantages (like $s=0.5$) would be expected to dominate even after a few cycles]{style="color:#0066FF;"}
+[- The selection coefficient is a critical parameter determining the rate of adaptation]{style="color:#0066FF;"}
+
+[- In the LTEE (Long-Term Evolution Experiment), mutations with larger selection coefficients would quickly sweep through the population]{style="color:#0066FF;"}
+
+[- For mutations with small fitness advantages (like $s=0.01$), genetic drift during bottlenecks might counteract selection, requiring many more passages for fixation]{style="color:#0066FF;"}
+
+[- Mutations with large fitness advantages (like $s=0.5$) would be expected to dominate even after a few cycles]{style="color:#0066FF;"}
 
 [4. **Mathematical explanation**:]{style="color:#0066FF;"}
 
-[- The exponential term $e^{st}$ amplifies even small differences in $s$ over time]{style="color:#0066FF;"} [- For $s=0.01$ and $t=5$, we get $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$]{style="color:#0066FF;"} [- For $s=0.5$ and $t=5$, we get $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$]{style="color:#0066FF;"} \[- This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change\]{style="color:#0066FF;"}
+[- The exponential term $e^{st}$ amplifies even small differences in $s$ over time]{style="color:#0066FF;"}
+
+[- For $s=0.01$ and $t=5$, we get $e^{0.01 \times 5} = e^{0.05} \approx 1.0513$]{style="color:#0066FF;"} [- For $s=0.5$ and $t=5$, we get $e^{0.5 \times 5} = e^{2.5} \approx 12.1825$]{style="color:#0066FF;"}
+
+[- This demonstrates why even small fitness advantages can eventually lead to fixation given enough time, while large fitness advantages lead to rapid change]{style="color:#0066FF;"}
 
 [This calculation illustrates why beneficial mutations with larger selection coefficients are typically observed first in evolution experiments, while those with smaller effects may take much longer to detect.]{style="color:#0066FF;"}
 
@@ -1008,11 +1021,11 @@ cat("Standard deviation:", sd_k, "\n")
 hist(k_samples, 
      main = "Distribution of Mutants in Next Bottleneck",
      xlab = "Number of mutants (k)",
-     col = "#DE0099",
+     col = "#FF7E1D",
      breaks = 30)
 
 # Mean line
-abline(v = mean_k, col = "#FF7E1D", lwd = 2)
+abline(v = mean_k, col = "#DE0099", lwd = 2)
 ```
 
 [The number of mutants sampled for the next bottleneck follows a binomial distribution with parameters $K = 5 \times 10^6$ and probability $x' = 0.01050732$. The mean is 52,535 mutants with a standard deviation of 228.73, and the distribution approximates a normal curve as shown in the histogram.]{style="color:#0066FF;"}
