@@ -663,9 +663,39 @@ if (length(day0_seq_indices) >= 2) {
 
 ## Exercise 2 - Simulating experimental evolution with serial passage and mutations
 
-In this exercise, we will analyze the evolution of a haploid and asexual population in the long-term evolution experiment (LTEE), which is an evolution experiment on *Escherichia coli* bacteria, performed with serial passages. For this, let us consider a model with serial dilutions such that the population of initial size $K$ (bottleneck) undergoes deterministic exponential growth for a time $t$ and then $K$ individuals are selected randomly from the grown population to form the next bottleneck (serial transfer), and so on. We assume that there are two types of individuals, wild-types with fitness 1 and mutants with fitness $1+s$. These fitnesses represent deterministic exponential growth rates. Here, for simplicity, we will assume that all mutants have the same value of $s$.
+*In this exercise, we will analyze the evolution of a haploid and asexual population in the long-term evolution experiment (LTEE), which is an evolution experiment on Escherichia coli bacteria, performed with serial passages. For this, let us consider a model with serial dilutions such that the population of initial size* $K$ *(bottleneck) undergoes deterministic exponential growth for a time* $t$ *and then* $K$ *individuals are selected randomly from the grown population to form the next bottleneck (serial transfer), and so on. We assume that there are two types of individuals, wild-types with fitness 1 and mutants with fitness* $1+s$*. These fitnesses represent deterministic exponential growth rates. Here, for simplicity, we will assume that all mutants have the same value of* $s$*.*
 
-1.  In this first question, we neglect all mutations, and thus we assume that there are only wild-type individuals in the population. In the LTEE, serial transfer is performed everyday. Population size is multiplied by 100 at the end of the day, compared to the initial bottleneck at the beginning of the day. Recall that we assume for simplicity that growth is exponential. What is the value of $t$ that matches the LTEE?
+1.  *In this first question, we neglect all mutations, and thus we assume that there are only wild-type individuals in the population. In the LTEE, serial transfer is performed everyday. Population size is multiplied by 100 at the end of the day, compared to the initial bottleneck at the beginning of the day. Recall that we assume for simplicity that growth is exponential. What is the value of* $t$ *that matches the LTEE?*
+
+*We need to determine the value of time* $t$ *that matches the LTEE conditions, where the population size is multiplied by 100 during each growth phase.*
+
+*In the LTEE, the population undergoes exponential growth where: - Initial size:* $K$ *(bottleneck) - Final size before transfer:* $100K$ *- Growth rate for wild-type:* $r = 1$
+
+*For exponential growth, the population size follows:*
+
+$$N(t) = N(0) \times e^{rt}$$
+
+*Where* $N(0) = K$ *and* $N(t) = 100K$
+
+*Therefore:*
+
+$$100K = K \times e^{1 \times t}$$
+
+*Dividing both sides by* $K$*:*
+
+$$100 = e^t$$
+
+*Taking the natural logarithm:*
+
+$$\ln(100) = t$$
+
+*Let's calculate this value:*
+
+```{r}
+# Calculate the time t needed for 100-fold growth 
+t = log(100) # natural logarithm 
+print(paste("Time t =", round(t, 4), "generations"))
+```
 
 2.  In this question, we will consider that some mutants may be present initially, but that no new mutation may happen during the growth phase.
 
