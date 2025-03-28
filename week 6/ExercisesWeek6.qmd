@@ -924,6 +924,22 @@ cat("Coefficient of variation:", cv_fraction, "\n")
 -   What is the name of the probability distribution that $k$ follows?
 -   Write the formula for the probability $P(k)$ to obtain a given value of $k$. Note: here, if possible, we recommend using LaTeX for presentation quality.
 
+### *a) Probability distribution for the number of mutants sampled*
+
+*The number of mutants* $k$ *sampled to form the next bottleneck follows a **binomial distribution**.*
+
+*This is because: - We're sampling* $K$ *individuals from a large population - Each individual sampled is either a mutant (with probability* $x'$*) or wild-type (with probability* $1-x'$*) - Each sampling event is independent - We're interested in the number of "successes" (mutants) in* $K$ *trials*
+
+### *b) Formula for the probability* $P(k)$
+
+*The probability of sampling exactly* $k$ *mutants when forming a bottleneck of size* $K$ *is given by:*
+
+$$P(k) = \binom{K}{k} (x')^k (1-x')^{K-k}$$
+
+*Where: -* $k$ *is the number of mutants sampled (*$0 \leq k \leq K$*) -* $K$ *is the bottleneck size -* $x'$ *is the mutant fraction after growth -* $\binom{K}{k} = \frac{K!}{k!(K-k)!}$ *is the binomial coefficient*
+
+*This formula represents the probability mass function of the binomial distribution* $B(K, x')$*.*
+
 6.  In this question, we will sample the number $k$ of mutants that exist at the next bottleneck, assuming that $s=0.01$, $K=5\times 10^6$ and $x=0.01$, and taking $t=5$.
 
 -   Sample $N=1000$ different values of $k$.
