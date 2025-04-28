@@ -14,7 +14,6 @@ output:
     number_sections: true
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 knitr::opts_chunk$set(echo = TRUE)
@@ -50,7 +49,6 @@ library(gplots)
 
 ```
 
-
 # Biological questions and data-set {.tabset}
 
 ## Biological Question
@@ -61,17 +59,15 @@ A molecular hallmark of ALS is the mislocalization of RNA-binding proteins to th
 
 **In this assignment, your goal is to investigate whether ALS-related mutations lead to changes in gene expression during the differentiation of induced pluripotent stem cells (iPSCs) into motor neurons.**
 
-
 ## Data-set
 
 The data required for this assignment are similar to those used in Lecture 8 & 9 and can be downloaded from [Zenodo](https://zenodo.org/records/10944047). The high-throughput poly(A) RNA-seq data are described in [Neeves et al., *Brain* (2022)](https://pubmed.ncbi.nlm.nih.gov/33693641/).
 
-These data are derived from **cytoplasmic** fractions of human induced pluripotent stem cells (hiPSCs; day 0), neural precursors (NPCs; day 3 and day 7), ‘patterned’ precursor motor neurons (ventral spinal cord; pMN; day 14), post-mitotic but electrophysiologically immature motor neurons (MN; day 22), and electrophysiologically active motor neurons (mMNs; day 35). Samples were generated from both **healthy** individuals and **ALS** patients.
+These data are dearived from **cytoplasmic** fractions of human induced pluripotent stem cells (hiPSCs; day 0), neural precursors (NPCs; day 3 and day 7), ‘patterned’ precursor motor neurons (ventral spinal cord; pMN; day 14), post-mitotic but electrophysiologically immature motor neurons (MN; day 22), and electrophysiologically active motor neurons (mMNs; day 35). Samples were generated from both **healthy** individuals and **ALS** patients.
 
 ![Schematic depicting the iPSC differentiation strategy for motor neurogenesis. Arrows indicate sampling time-points in days when cells were fractionated into nuclear and cytoplasmic compartments prior to deep (polyA) RNA-sequencing. Four iPSC clones were obtained from four different healthy controls and three iPSC clones from two ALS patients with VCP mutations: R155C and R191Q; hereafter termed VCPmu. Induced-pluripotent stem cells (iPSC); neural precursors (NPC); “patterned” precursor motor neurons (ventral spinal cord; pMN); post-mitotic but electrophysiologically inactive motor neurons (MN); electrophysiologically active MNs (mMN).](./protocol.png)
 
 The gene expression count data were obtained using [Kallisto](https://pachterlab.github.io/kallisto/about) (Bray et al., 2016), aligned against the Gencode hg38 release of the *Homo sapiens* transcriptome.
-
 
 ```{r load_data,warning=FALSE,fig.width=8, fig.height=4}
 load("./data_09_04_2024.RData")
@@ -103,74 +99,119 @@ mycols1                <- unlist(lapply(info$mutant,function(Z)return(mycols_con
 myE_gel <- log2(1+myE_ge)
 ```
 
-
 # Task 1: Identification of reliably expressed genes (2/10 pts)
 
-Your first task is to identify the **reliably expressed genes per condition**.  
-> ⚠️ *Note: Conditions in this assignment differ from those used in previous exercises — make sure to define them correctly (e.g., time points, genotypes, or their combinations).*
+Your first task is to identify the **reliably expressed genes per condition**.\
+\> ⚠️ *Note: Conditions in this assignment differ from those used in previous exercises — make sure to define them correctly (e.g., time points, genotypes, or their combinations).*
 
 ## Steps:
-1. For each condition, identify reliably expressed genes. You may define "reliable expression" based on a minimum count threshold (e.g., counts > 10 in most replicates).
-2. Visualize the number of reliably expressed genes **per condition** in a plot.
-3. Report the **total number of reliably expressed genes** across all conditions (e.g., union or intersection depending on your criteria).
-4. Please discuss whether there are differences between control and ALS patients in the number of reliably expressed genes, and whether this result was expected — using a maximum of two sentences.
 
+1.  For each condition, identify reliably expressed genes. You may define "reliable expression" based on a minimum count threshold (e.g., counts \> 10 in most replicates).
+2.  Visualize the number of reliably expressed genes **per condition** in a plot.
+3.  Report the **total number of reliably expressed genes** across all conditions (e.g., union or intersection depending on your criteria).
+4.  Please discuss whether there are differences between control and ALS patients in the number of reliably expressed genes, and whether this result was expected — using a maximum of two sentences.
 
 ```{r selection_threshold,eval=TRUE,fig.width=10,fig.height=3}
-layout(matrix(c(1,1,2,3),ncol=4,nrow=1,byrow=TRUE))
-# 1 Fit bimodal distribution
-#bimdens              <- ...
+layout(matrix(c(1,1,2,3), ncol=4, nrow=1, byrow=TRUE))
 
-# 2. Identify limit that discriminate foreground from background for each samples
-#Lims                 <- ...
+# 1. Fit bimodal distribution to identify thresholds
+bimdens <- apply(myE_gel, 2, function(x) {
+  dens <- density(x)
+  # Find local minima in density (potential threshold)
+  inflection <- which(diff(sign(diff(dens$y))) > 0) + 1
+  if(length(inflection) > 0) {
+    return(dens$x[inflection[1]]) # Return first local minimum
+  } else {
+    return(3) # Default threshold if no clear bimodal distribution
+  }
+})
 
-# 3. Plot the distribution of the pre-filtered gene counts along side the limits
+# 2. Identify limit that discriminates foreground from background for each sample
+Lims <- bimdens
+
+# 3. Plot the distribution alongside the limits
+gene_means <- rowMeans(myE_gel)
+hist(gene_means, breaks=100, main="Distribution of mean log2 counts", 
+     xlab="Mean log2 counts", col="#6699FF", border="white")
+abline(v=mean(Lims), col="#CC33CC", lwd=2)
+text(mean(Lims)+0.5, max(hist(gene_means, breaks=100, plot=FALSE)$counts)*0.8, 
+     paste("Mean threshold =", round(mean(Lims), 2)), col="#CC33CC")
 
 # 4. Select reliably expressed genes in each sample
+is_expressed_sample <- matrix(FALSE, nrow=nrow(myE_gel), ncol=ncol(myE_gel))
+for(i in 1:ncol(myE_gel)) {
+  is_expressed_sample[,i] <- myE_gel[,i] > Lims[i]
+}
 
 # 5. Select reliably expressed genes in each group
+groups <- levels(info$group)
+is_expressed_group <- matrix(FALSE, nrow=nrow(myE_gel), ncol=length(groups))
+colnames(is_expressed_group) <- groups
+
+# Define reliable expression as present in at least 60% of samples per group
+for(i in 1:length(groups)) {
+  group_samples <- which(info$group == groups[i])
+  # For each gene, count in how many samples of this group it's expressed
+  expr_count <- rowSums(is_expressed_sample[, group_samples, drop=FALSE])
+  # Gene is reliably expressed if it's expressed in at least 60% of samples
+  is_expressed_group[,i] <- expr_count >= 0.6 * length(group_samples)
+}
+
+# Count reliably expressed genes per group
+no_reliably_expressed_genes_group <- colSums(is_expressed_group)
+
+# Count reliably expressed genes per sample
+no_reliably_expressed_genes_samples <- colSums(is_expressed_sample)
 
 # 6. Select reliably expressed genes to be considered in this study
-#is_expressed_global  <- ...
+# A gene is considered reliably expressed if it's expressed in at least one group
+is_expressed_global <- rowSums(is_expressed_group) > 0
 
 # 7. Create data-table with reliably expressed genes
-myE_gelf             <- myE_gel[is_expressed_global,]
+myE_gelf <- myE_gel[is_expressed_global,]
 
+# Prepare visualization data
+temp <- matrix(no_reliably_expressed_genes_group, nrow=2, byrow=TRUE)
+rownames(temp) <- c("CTRL", "ALS")
 
-temp <- matrix(no_reliably_expressed_genes_group,nrow=2,byrow=TRUE)
-rownames(temp)<- c("CTRL","ALS")
-boxplot(no_reliably_expressed_genes_samples,las=1,ylab="# reliably expressed per sample")
-barplot(t(temp),beside=TRUE,las=1,ylab="# reliably expressed genes per group",col=mycols_days)
-legend("top",ncol=1,leg=c(0,3,7,14,22,35),col=mycols_days,bty="n",cex=0.8,pch=15)
+# Plot results
+boxplot(no_reliably_expressed_genes_samples, las=1, 
+        ylab="# reliably expressed per sample")
+
+# Use the mycols_days palette as defined in the setup
+barplot(t(temp), beside=TRUE, las=1, 
+        ylab="# reliably expressed genes per group", 
+        col=mycols_days)
+legend("top", ncol=1, leg=c(0, 3, 7, 14, 22, 35), 
+       col=mycols_days, bty="n", cex=0.8, pch=15)
+
+# Report total number of reliably expressed genes
+cat("Total number of reliably expressed genes across all conditions:", sum(is_expressed_global), "\n")
 ```
-
 
 ***Answer***
 
-
 ## Quantile normalisation
+
 ```{r normalisation,eval=TRUE,fig.width=7,fig.height=4}
-#Quantile normalisation
-myE_gen               <- limma::normalizeQuantiles(myE_gelf)
-par(mfrow=c(2,2),mar=c(4,4,2,2))
-geneplotter::multidensity(myE_gelf,leg=FALSE,main="Prior normalisation",las=1,xlab="read count [log2]")
-geneplotter::multidensity(myE_gen,leg=FALSE,main="Quantile normalised",las=1,xlab="read count [log2]")
+# Quantile normalization
+myE_gen <- limma::normalizeQuantiles(myE_gelf)
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+geneplotter::multidensity(myE_gelf, leg=FALSE, main="Prior normalisation", 
+                         las=1, xlab="read count [log2]")
+geneplotter::multidensity(myE_gen, leg=FALSE, main="Quantile normalised", 
+                         las=1, xlab="read count [log2]")
 
-
-boxplot(myE_gelf,outline=FALSE,las=1,ylab="read count")
-boxplot(myE_gen,outline=FALSE,las=1)
-
+boxplot(myE_gelf, outline=FALSE, las=1, ylab="read count")
+boxplot(myE_gen, outline=FALSE, las=1)
 ```
-
-
 
 # Task 2: Unsupervised Hierarchical Clustering Analysis (2/10 pts)
 
-Perform hierarchical clustering analysis of the samples.  
+Perform hierarchical clustering analysis of the samples.\
 *Hint: Use the different color palettes generated above to annotate your heatmap or dendrogram.*
 
-Discuss the clustering in terms of the covariates, specifically, **differentiation stage** versus **ALS mutation status**,  using a maximum of two sentences.
-
+Discuss the clustering in terms of the covariates, specifically, **differentiation stage** versus **ALS mutation status**, using a maximum of two sentences.
 
 ```{r hc_all_dist_corr_mannathan,fig.width=5,fig.height=5}
 CEX=0.7
@@ -178,10 +219,7 @@ par(mfrow=c(1,2))
 
 ```
 
-
-**Answer**  
-
-
+**Answer**
 
 # Singular Value Decomposition (SVD)
 
@@ -229,9 +267,8 @@ ScrePlot <- function(pi,dp){
 
 ### Task 4.1: Generate PCA Plots of the First 4 Components (1/10 pts)
 
-Generate PCA plots for the first four principal components of the gene expression data.  
+Generate PCA plots for the first four principal components of the gene expression data.\
 Make sure to **label the axes** (e.g., "PC1 (variance%)") and use **appropriate colors** to reflect relevant covariates (e.g., time point, genotype, or condition).
-
 
 ```{r pca_svd_col_time,warning=FALSE,fig.width=10, fig.height=5}
 par(mfrow=c(4,4),mar=c(4,4,1,1))
@@ -279,10 +316,9 @@ mtext(side=3,line=1,text=paste("min distance=",mind),cex=0.8)
 
 ### Task 5.1: Components Over Time (2/10 pts)
 
-Plot the principal components over time using the first left singular vectors.  
-Be sure to **separate control versus ALS samples** in your visualization.  
+Plot the principal components over time using the first left singular vectors.\
+Be sure to **separate control versus ALS samples** in your visualization.\
 Discuss in **one sentence** whether an ALS-related effect is detected.
-
 
 ```{r component_over_time,warning=FALSE,fig.width=10, fig.height=4}
 #1. Select the loading of the control samples as well as info; create a new grouping
@@ -325,23 +361,20 @@ for(i in c(1:4)){
 
 ```
 
-**Answer**  
-
+**Answer**
 
 ### Task 5.2 – Bonus: Investigate the Biological Meaning of the Component of Interest (2/10 pts)
 
-Having identified a component associated with ALS, you are now invited to further investigate the **genes most strongly contributing to this component** and explore their associated **biological pathways**.  
+Having identified a component associated with ALS, you are now invited to further investigate the **genes most strongly contributing to this component** and explore their associated **biological pathways**.\
 Please provide:
 
-- A description of how the genes were selected (e.g., based on loading values).
-- The results of a pathway enrichment or gene ontology analysis.
-
+-   A description of how the genes were selected (e.g., based on loading values).
+-   The results of a pathway enrichment or gene ontology analysis.
 
 #### Bonus 1 – Extraction of Top-Contributing and Least-Contributing Genes (1 pt)
 
-Extract the genes that contribute most strongly (both positively and negatively) to the component of interest, as well as those that contribute the least.  
+Extract the genes that contribute most strongly (both positively and negatively) to the component of interest, as well as those that contribute the least.\
 These genes can be identified based on their **loading values** (right singular vectors) in the SVD analysis.
-
 
 ```{r extract_most_contributing,warning=FALSE,fig.width=7, fig.height=7,eval=TRUE}
 
@@ -349,9 +382,5 @@ These genes can be identified based on their **loading values** (right singular 
 
 #### Bonus 2 – Visual Inspection of Gene Behaviors (1 pt)
 
-Please provide a visualization of your choice to illustrate the behavior of the genes most strongly associated with the component of interest.  
+Please provide a visualization of your choice to illustrate the behavior of the genes most strongly associated with the component of interest.\
 *Remember:* There are both positively and negatively contributing genes, so consider showing both directions of contribution (e.g., using a heatmap, expression trends, or correlation plots).
-
-
-
-
